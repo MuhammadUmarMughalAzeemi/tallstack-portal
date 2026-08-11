@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             MbbsPassedSeeder::class,
             TrainingProgramSeeder::class,
             UserSeeder::class,
+            RolesAndPermissionsSeeder::class,
         ]);
     }
 }

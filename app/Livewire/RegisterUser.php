@@ -47,15 +47,16 @@ class RegisterUser extends Component
             'name' => 'required|regex:/^[A-Za-z\s\-]+$/',
             'email' => [
                 'required',
-                'email:rfc,dns',
+                'email',
                 'unique:users,email',
             ],
             'password' => 'required|min:8',
             'password_confirmation' => 'required_with:password|same:password',
             'cnic' => 'required',
         ];
-        $size = in_array($this->showInput, [4, 5]) ? 9 : 13;
-        if (in_array($this->showInput, [4, 5, 6])) {
+        $cnicId = (int) ($this->cnic ?? $this->showInput);
+        $size = in_array($cnicId, [4, 5]) ? 9 : 13;
+        if (in_array($cnicId, [4, 5, 6])) {
             // Passport (alphanumeric)
             $requiredRules['cnic_passport'] = [
                 'required',
@@ -84,8 +85,7 @@ class RegisterUser extends Component
     public function updatedCnic($value)
     {
         $identityType = $this->userServices->getAllCnicPassport()
-            ->where('id', $value)
-            ->first();
+            ->firstWhere('id', (int) $value);
         if ($identityType) {
             $this->showInput = (int) $value;
             $this->currentLabel = $identityType->name;

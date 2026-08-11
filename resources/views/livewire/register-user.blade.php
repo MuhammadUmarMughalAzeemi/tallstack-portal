@@ -27,7 +27,7 @@
                 <div
                     class="mt-4"
                     x-data="{
-                        value: @entangle('cnic_passport').defer
+                        value: @entangle('cnic_passport')
                     }"
                 >
                     <x-input

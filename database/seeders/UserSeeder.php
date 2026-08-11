@@ -36,5 +36,7 @@ class UserSeeder extends Seeder
                 'status' => 2,
             ]
         );
+
+        $this->call(RolesAndPermissionsSeeder::class);
     }
 }
