@@ -53,6 +53,11 @@ class CollegesList extends Component
         }
     }
 
+    public function back(): void
+    {
+        $this->dispatch('goToStep', 4);
+    }
+
     public function submit(): void
     {
         if (empty($this->selectMphilSubject) && empty($this->selectPhdSubject) && empty($this->selectMasterSubject) && empty($this->selectDiplomaCertificateSubject) && empty($this->selectTrainingPrograms)) {

@@ -22,6 +22,11 @@ class PersonalInfo extends Component
         $this->phone = $data['phone'] ?? '';
     }
 
+    public function back(): void
+    {
+        $this->dispatch('goToStep', 1);
+    }
+
     public function save()
     {
         try {

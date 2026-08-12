@@ -36,7 +36,9 @@
                 required />
         </div>
 
-        <div class="pt-6 flex justify-end gap-4 border-t border-slate-50">
+        <div class="pt-6 flex justify-between gap-4 border-t border-slate-50">
+            <x-button wire:click="back" color="slate" flat class="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[9px]" left-icon="arrow-left">Back</x-button>
+
             <x-button wire:click="save" wire:loading.attr="disabled" wire:target="save" color="primary" class="h-12 px-10 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-primary-200 hover:translate-y-[-2px] transition-all flex items-center justify-center" right-icon="arrow-right">
                 <span wire:loading.inline wire:target="save" class="mr-2">
                     <svg class="w-4 h-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
