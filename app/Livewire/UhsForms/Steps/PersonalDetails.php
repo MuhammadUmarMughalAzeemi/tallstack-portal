@@ -8,6 +8,7 @@ use App\Models\Gender;
 use App\Models\Nationality;
 use App\Models\PersonalDetail;
 use App\Models\ResidenceArea;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -64,33 +65,40 @@ class PersonalDetails extends Component
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        if ($user) {
-            $this->name = $user->name;
-            $this->email = $user->email;
-            $this->mobileNumber = $user->mobile_number;
-            $this->fatherName = $user->father_name;
-            $this->cnic = $user->cnic_passport_id;
-            $this->cnic_passport = $user->cnic_passport;
-
-            $details = $user->personalDetails;
-            if ($details) {
-                $this->motherName = $details->mother_name;
-                $this->dob = $details->date_of_birth;
-                $this->mobileNumber = $details->mobile_number;
-                $this->secondaryNumber = $details->secondary_number;
-                $this->telephoneNumber = $details->telephone_number;
-                $this->genderId = $details->gender_id;
-                $this->residenceId = $details->residence_area_id;
-                $this->address = $details->address;
-                $this->domicile = $details->district_id;
-                $this->cnic = $details->cnic_passport_id;
-                $this->cnic_passport = $details->cnic_passport;
-                $this->nationalityId = $details->nationality_id;
-                $this->city = $details->city;
-                $this->country = $details->country;
-                $this->showInput = $details->showInput;
-            }
+        if (! $user) {
+            return;
         }
+
+        $this->name    = $user->name;
+        $this->email   = $user->email;
+        $this->mobileNumber = $user->mobile_number;
+        $this->fatherName   = $user->father_name;
+        $this->cnic         = $user->cnic_passport_id;
+        $this->cnic_passport = $user->cnic_passport;
+
+        $details = $user->personalDetails;
+        if ($details) {
+            $this->motherName      = $details->mother_name;
+            $this->dob             = $details->date_of_birth;
+            $this->mobileNumber    = $details->mobile_number;
+            $this->secondaryNumber = $details->secondary_number;
+            $this->telephoneNumber = $details->telephone_number;
+            $this->genderId        = $details->gender_id;
+            $this->residenceId     = $details->residence_area_id;
+            $this->address         = $details->address;
+            $this->domicile        = $details->district_id;
+            $this->cnic            = $details->cnic_passport_id;
+            $this->cnic_passport   = $details->cnic_passport;
+            $this->nationalityId   = $details->nationality_id;
+            $this->city            = $details->city;
+            $this->country         = $details->country;
+            $this->showInput       = $details->showInput;
+        }
+    }
+
+    public function back(): void
+    {
+        $this->dispatch('goToStep', 1);
     }
 
     public function submit(): void
@@ -139,12 +147,19 @@ class PersonalDetails extends Component
 
     public function render()
     {
-        return view('livewire.uhs-forms.steps.personal-details', [
-            'genders' => Gender::all(),
-            'residenceAreas' => ResidenceArea::all(),
-            'nationalities' => Nationality::all(),
-            'districts' => District::all(),
-            'cnicPassports' => CnicPassport::all(),
-        ]);
+        // Cache static lookup data for 24 hours — these tables rarely change
+        $genders        = Cache::remember('lookup_genders', 86400, fn () => Gender::all());
+        $residenceAreas = Cache::remember('lookup_residence_areas', 86400, fn () => ResidenceArea::all());
+        $nationalities  = Cache::remember('lookup_nationalities', 86400, fn () => Nationality::all());
+        $districts      = Cache::remember('lookup_districts', 86400, fn () => District::all());
+        $cnicPassports  = Cache::remember('lookup_cnic_passports', 86400, fn () => CnicPassport::all());
+
+        return view('livewire.uhs-forms.steps.personal-details', compact(
+            'genders',
+            'residenceAreas',
+            'nationalities',
+            'districts',
+            'cnicPassports',
+        ));
     }
 }

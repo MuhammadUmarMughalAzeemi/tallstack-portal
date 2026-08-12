@@ -5,6 +5,7 @@ namespace App\Livewire\UhsForms\Steps;
 use App\Models\College;
 use App\Models\MphillPhdSubjects;
 use App\Models\TrainingProgram;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use TallStackUi\Traits\Interactions;
@@ -19,36 +20,31 @@ class CollegesList extends Component
     public $selectDiplomaCertificateSubject;
     public array $selectTrainingPrograms = [];
 
-    public int $phdId = 1;
-    public int $mphilId = 2;
-    public int $masterId = 3;
-    public int $certificateId = 4;
-
-    protected function rules(): array
-    {
-        return [
-            // At least one preference must be selected across Mphil, Phd, Master, or Training Programs
-        ];
-    }
+    public int $phdId          = 1;
+    public int $mphilId        = 2;
+    public int $masterId       = 3;
+    public int $certificateId  = 4;
 
     public function mount(): void
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        if ($user) {
-            $subjects = $user->mphillPhdSubjects;
-            if ($subjects) {
-                $this->selectPhdSubject = $subjects->where('seat_category_id', $this->phdId)->first()?->subject;
-                $this->selectMphilSubject = $subjects->where('seat_category_id', $this->mphilId)->pluck('subject')->toArray();
-                $this->selectMasterSubject = $subjects->where('seat_category_id', $this->masterId)->first()?->subject;
-                $this->selectDiplomaCertificateSubject = $subjects->where('seat_category_id', $this->certificateId)->first()?->subject;
-            }
+        if (! $user) {
+            return;
+        }
 
-            if ($user->training_program_id) {
-                $trainingData = json_decode($user->training_program_id, true);
-                if (is_array($trainingData)) {
-                    $this->selectTrainingPrograms = collect($trainingData)->pluck('name')->toArray();
-                }
+        $subjects = $user->mphillPhdSubjects;
+        if ($subjects) {
+            $this->selectPhdSubject    = $subjects->where('seat_category_id', $this->phdId)->first()?->subject;
+            $this->selectMphilSubject  = $subjects->where('seat_category_id', $this->mphilId)->pluck('subject')->toArray();
+            $this->selectMasterSubject = $subjects->where('seat_category_id', $this->masterId)->first()?->subject;
+            $this->selectDiplomaCertificateSubject = $subjects->where('seat_category_id', $this->certificateId)->first()?->subject;
+        }
+
+        if ($user->training_program_id) {
+            $trainingData = json_decode($user->training_program_id, true);
+            if (is_array($trainingData)) {
+                $this->selectTrainingPrograms = collect($trainingData)->pluck('name')->toArray();
             }
         }
     }
@@ -60,7 +56,13 @@ class CollegesList extends Component
 
     public function submit(): void
     {
-        if (empty($this->selectMphilSubject) && empty($this->selectPhdSubject) && empty($this->selectMasterSubject) && empty($this->selectDiplomaCertificateSubject) && empty($this->selectTrainingPrograms)) {
+        if (
+            empty($this->selectMphilSubject) &&
+            empty($this->selectPhdSubject) &&
+            empty($this->selectMasterSubject) &&
+            empty($this->selectDiplomaCertificateSubject) &&
+            empty($this->selectTrainingPrograms)
+        ) {
             $this->toast()->error('Please select at least one program or specialty preference.')->send();
             $this->addError('preferences', 'Please select at least one program or specialty preference.');
 
@@ -68,40 +70,32 @@ class CollegesList extends Component
         }
 
         /** @var \App\Models\User $user */
-        $user = auth()->user();
+        $user   = auth()->user();
         $userId = $user->id;
 
         MphillPhdSubjects::where('user_id', $userId)->delete();
 
-        if (! empty($this->selectMphilSubject)) {
-            foreach ((array) $this->selectMphilSubject as $subjectName) {
-                MphillPhdSubjects::create([
-                    'user_id'          => $userId,
-                    'subject'          => $subjectName,
-                    'seat_category_id' => $this->mphilId,
-                ]);
-            }
+        $inserts = [];
+
+        foreach ((array) $this->selectMphilSubject as $subjectName) {
+            $inserts[] = ['user_id' => $userId, 'subject' => $subjectName, 'seat_category_id' => $this->mphilId];
         }
 
         if ($this->selectPhdSubject) {
-            MphillPhdSubjects::create([
-                'user_id'          => $userId,
-                'subject'          => $this->selectPhdSubject,
-                'seat_category_id' => $this->phdId,
-            ]);
+            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectPhdSubject, 'seat_category_id' => $this->phdId];
         }
 
         if ($this->selectMasterSubject) {
-            MphillPhdSubjects::create([
-                'user_id'          => $userId,
-                'subject'          => $this->selectMasterSubject,
-                'seat_category_id' => $this->masterId,
-            ]);
+            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectMasterSubject, 'seat_category_id' => $this->masterId];
+        }
+
+        if (! empty($inserts)) {
+            MphillPhdSubjects::insert($inserts);
         }
 
         if (! empty($this->selectTrainingPrograms)) {
             $data = [];
-            $id = 1;
+            $id   = 1;
             foreach ($this->selectTrainingPrograms as $tp) {
                 $data[] = ['id' => $id++, 'name' => $tp];
             }
@@ -114,11 +108,17 @@ class CollegesList extends Component
 
     public function render()
     {
-        return view('livewire.uhs-forms.steps.colleges-list', [
-            'phdColleges' => College::where('seat_category_id', 1)->get(),
-            'mphilColleges' => College::where('seat_category_id', 2)->get(),
-            'masterColleges' => College::where('seat_category_id', 3)->get(),
-            'trainingPrograms' => TrainingProgram::all(),
-        ]);
+        // College and training data is admin-managed — safe to cache for 24 hours
+        $phdColleges      = Cache::remember('lookup_phd_colleges', 86400, fn () => College::where('seat_category_id', 1)->get());
+        $mphilColleges    = Cache::remember('lookup_mphil_colleges', 86400, fn () => College::where('seat_category_id', 2)->get());
+        $masterColleges   = Cache::remember('lookup_master_colleges', 86400, fn () => College::where('seat_category_id', 3)->get());
+        $trainingPrograms = Cache::remember('lookup_training_programs', 86400, fn () => TrainingProgram::all());
+
+        return view('livewire.uhs-forms.steps.colleges-list', compact(
+            'phdColleges',
+            'mphilColleges',
+            'masterColleges',
+            'trainingPrograms',
+        ));
     }
 }

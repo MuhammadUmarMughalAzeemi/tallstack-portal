@@ -4,6 +4,7 @@ namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\AdmissionTest as AdmissionTestModel;
 use App\Models\MdcatCenter;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use TallStackUi\Traits\Interactions;
@@ -76,30 +77,43 @@ class AdmissionTest extends Component
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        if ($user) {
-            $this->cnic = $user->personalDetails?->cnic_passport;
-            $test = $user->admissionTest;
-
-            if ($test) {
-                $this->mdCatCnic = $test->md_cat_cnic;
-                $this->mdCatCenter = $test->md_catCenter_id;
-                $this->mdCatObtainedMarks = $test->md_cat_obtained_marks;
-                $this->satBiologyMarks = $test->sat_biology_obtained_marks;
-                $this->satChemistryMarks = $test->sat_chemistry_obtained_marks;
-                $this->satPhyMathMarks = $test->sat_phy_math_obtained_marks;
-                $this->satTestDate = $test->sat_test_date;
-                $this->satUsername = $test->sat_username;
-                $this->satPassword = $test->sat_password;
-                $this->ucatBand = $test->ucat_band;
-                $this->ucatObtainedMarks = $test->ucat_obtained_marks;
-                $this->ucatCandidateId = $test->ucat_candidate_id;
-                $this->ucatTestDate = $test->ucat_test_date;
-                $this->mcatTestDate = $test->mcat_test_date;
-                $this->mcatObtainedMarks = $test->mcat_obtained_marks;
-                $this->mcatUsername = $test->mcat_username;
-                $this->mcatPassword = $test->mcat_password;
-            }
+        if (! $user) {
+            return;
         }
+
+        $this->cnic = $user->personalDetails?->cnic_passport;
+        $test = $user->admissionTest;
+
+        if ($test) {
+            $this->mdCatCnic          = $test->md_cat_cnic;
+            $this->mdCatCenter        = $test->md_catCenter_id;
+            $this->mdCatObtainedMarks = $test->md_cat_obtained_marks;
+            $this->satBiologyMarks    = $test->sat_biology_obtained_marks;
+            $this->satChemistryMarks  = $test->sat_chemistry_obtained_marks;
+            $this->satPhyMathMarks    = $test->sat_phy_math_obtained_marks;
+            $this->satTestDate        = $test->sat_test_date;
+            $this->satUsername        = $test->sat_username;
+            $this->satPassword        = $test->sat_password;
+            $this->ucatBand           = $test->ucat_band;
+            $this->ucatObtainedMarks  = $test->ucat_obtained_marks;
+            $this->ucatCandidateId    = $test->ucat_candidate_id;
+            $this->ucatTestDate       = $test->ucat_test_date;
+            $this->mcatTestDate       = $test->mcat_test_date;
+            $this->mcatObtainedMarks  = $test->mcat_obtained_marks;
+            $this->mcatUsername       = $test->mcat_username;
+            $this->mcatPassword       = $test->mcat_password;
+
+            // Detect which exam type was previously saved
+            if ($test->md_cat_obtained_marks)  $this->selectedExam = 1;
+            elseif ($test->sat_biology_obtained_marks) $this->selectedExam = 2;
+            elseif ($test->ucat_obtained_marks) $this->selectedExam = 3;
+            elseif ($test->mcat_obtained_marks) $this->selectedExam = 4;
+        }
+    }
+
+    public function back(): void
+    {
+        $this->dispatch('goToStep', 3);
     }
 
     public function submit(): void
@@ -119,23 +133,23 @@ class AdmissionTest extends Component
         AdmissionTestModel::updateOrCreate(
             ['user_id' => $user->id],
             [
-                'md_cat_cnic' => $this->mdCatCnic,
-                'md_catCenter_id' => $this->mdCatCenter,
-                'md_cat_obtained_marks' => $this->mdCatObtainedMarks,
-                'sat_biology_obtained_marks' => $this->satBiologyMarks,
+                'md_cat_cnic'                 => $this->mdCatCnic,
+                'md_catCenter_id'             => $this->mdCatCenter,
+                'md_cat_obtained_marks'       => $this->mdCatObtainedMarks,
+                'sat_biology_obtained_marks'  => $this->satBiologyMarks,
                 'sat_chemistry_obtained_marks' => $this->satChemistryMarks,
                 'sat_phy_math_obtained_marks' => $this->satPhyMathMarks,
-                'sat_test_date' => $this->satTestDate,
-                'sat_username' => $this->satUsername,
-                'sat_password' => $this->satPassword,
-                'ucat_band' => $this->ucatBand,
-                'ucat_obtained_marks' => $this->ucatObtainedMarks,
-                'ucat_candidate_id' => $this->ucatCandidateId,
-                'ucat_test_date' => $this->ucatTestDate,
-                'mcat_obtained_marks' => $this->mcatObtainedMarks,
-                'mcat_test_date' => $this->mcatTestDate,
-                'mcat_username' => $this->mcatUsername,
-                'mcat_password' => $this->mcatPassword,
+                'sat_test_date'               => $this->satTestDate,
+                'sat_username'                => $this->satUsername,
+                'sat_password'                => $this->satPassword,
+                'ucat_band'                   => $this->ucatBand,
+                'ucat_obtained_marks'         => $this->ucatObtainedMarks,
+                'ucat_candidate_id'           => $this->ucatCandidateId,
+                'ucat_test_date'              => $this->ucatTestDate,
+                'mcat_obtained_marks'         => $this->mcatObtainedMarks,
+                'mcat_test_date'              => $this->mcatTestDate,
+                'mcat_username'               => $this->mcatUsername,
+                'mcat_password'               => $this->mcatPassword,
             ]
         );
 
@@ -145,8 +159,9 @@ class AdmissionTest extends Component
 
     public function render()
     {
-        return view('livewire.uhs-forms.steps.admission-test', [
-            'mdcatCenters' => MdcatCenter::all(),
-        ]);
+        // MDCAT centers are static admin data — cache for 24 hours
+        $mdcatCenters = Cache::remember('lookup_mdcat_centers', 86400, fn () => MdcatCenter::all());
+
+        return view('livewire.uhs-forms.steps.admission-test', compact('mdcatCenters'));
     }
 }

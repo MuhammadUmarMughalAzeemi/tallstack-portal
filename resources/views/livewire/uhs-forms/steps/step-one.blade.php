@@ -131,10 +131,14 @@
         </div>
 
         <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-            <button type="button" wire:click="editStep(6)" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span>Edit Uploaded Documents</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <x-button wire:click="back" color="slate" flat class="h-10 px-4 rounded-xl font-black uppercase tracking-widest text-[10px]" left-icon="arrow-left">Back</x-button>
+                <button type="button" wire:click="editStep(6)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>Edit Uploaded Documents</span>
+                </button>
+            </div>
+
             <button type="button" wire:click="editStep(8)" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center space-x-2">
                 <span>Proceed to Final Declaration</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>

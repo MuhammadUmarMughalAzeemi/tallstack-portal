@@ -402,4 +402,42 @@
 
     /* Custom CSS Overrides defined in PortalSetting */
     {{ $setting->custom_css ?? '' }}
+
+    /* ============================================================ */
+    /* 🛑 FORM VALIDATION ERRORS — Always red (overrides theme rules) */
+    /* ============================================================ */
+    [data-user-mode="light"] span:not(.text-white).text-rose-400,
+    [data-user-mode="light"] span:not(.text-white).text-rose-500,
+    [data-user-mode="light"] span:not(.text-white).text-red-500,
+    [data-user-mode="light"] span:not(.text-white).text-red-600,
+    [data-user-mode="light"] p.text-rose-400,
+    [data-user-mode="light"] p.text-rose-300,
+    [data-user-mode="light"] li.text-rose-300,
+    [data-user-mode="light"] .text-rose-400,
+    [data-user-mode="light"] .text-rose-500,
+    [data-user-mode="light"] .text-red-500,
+    [data-user-mode="light"] .text-red-600,
+    [data-user-mode="dark"] .text-rose-400,
+    [data-user-mode="dark"] .text-rose-500,
+    [data-user-mode="dark"] .text-red-500,
+    [data-user-mode="dark"] .text-red-600 {
+        color: rgb(251 113 133) !important;
+    }
+
+    /* Red borders on invalid inputs/selects/textareas */
+    [data-user-mode="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="color"]).border-rose-500,
+    [data-user-mode="light"] select.border-rose-500,
+    [data-user-mode="light"] textarea.border-rose-500,
+    [data-user-mode="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="color"]).border-rose-500,
+    [data-user-mode="dark"] select.border-rose-500,
+    [data-user-mode="dark"] textarea.border-rose-500 {
+        border-color: rgb(244 63 94) !important;
+    }
+
+    /* Keep the red border while the invalid field is focused */
+    [data-user-mode] input.border-rose-500:focus,
+    [data-user-mode] select.border-rose-500:focus,
+    [data-user-mode] textarea.border-rose-500:focus {
+        border-color: rgb(251 113 133) !important;
+    }
 </style>

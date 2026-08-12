@@ -64,6 +64,11 @@ class DocsAffidavit extends Component
         }
     }
 
+    public function back(): void
+    {
+        $this->dispatch('goToStep', 5);
+    }
+
     public function submit(): void
     {
         try {

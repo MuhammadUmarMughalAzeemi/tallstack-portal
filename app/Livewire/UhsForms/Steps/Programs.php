@@ -4,6 +4,7 @@ namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\Program;
 use App\Models\SeatCategory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use TallStackUi\Traits\Interactions;
@@ -30,13 +31,15 @@ class Programs extends Component
     public function mount(): void
     {
         $user = auth()->user();
-        if ($user) {
-            $this->seatCategories = $user->seatCategories->pluck('id')->toArray();
-            $this->programPriority = $user->program_priority;
-            $this->affirmation = $user->affirmation ?? 0;
-            $this->foreigner = $user->foreigner ?? 0;
-            $this->pmdcNo = $user->pmdc_pnmc;
+        if (! $user) {
+            return;
         }
+
+        $this->seatCategories  = $user->seatCategories->pluck('id')->toArray();
+        $this->programPriority = $user->program_priority;
+        $this->affirmation     = $user->affirmation ?? 0;
+        $this->foreigner       = $user->foreigner ?? 0;
+        $this->pmdcNo          = $user->pmdc_pnmc;
     }
 
     public function submit(): void
@@ -68,9 +71,10 @@ class Programs extends Component
 
     public function render()
     {
-        return view('livewire.uhs-forms.steps.programs', [
-            'allSeatCategories' => SeatCategory::all(),
-            'allPrograms' => Program::all(),
-        ]);
+        // Cached — seat categories and programs never change at runtime
+        $allSeatCategories = Cache::remember('lookup_seat_categories', 86400, fn () => SeatCategory::all());
+        $allPrograms       = Cache::remember('lookup_programs', 86400, fn () => Program::all());
+
+        return view('livewire.uhs-forms.steps.programs', compact('allSeatCategories', 'allPrograms'));
     }
 }
