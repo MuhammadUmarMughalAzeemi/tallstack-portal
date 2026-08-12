@@ -23,10 +23,6 @@ class AuthenticatedSessionController
 
         $user = Auth::user();
 
-        if ($user && ($user->email === 'admin@uhs.edu.pk' || $user->email === 'adminbig@uhs.com' || (method_exists($user, 'hasRole') && $user->hasRole(['admin', 'incharge-team', 'verification-team'])))) {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
-        }
-
         if ($user && $user->submitted_at) {
             return redirect()->intended(route('uhs-form-dashboard', absolute: false));
         }

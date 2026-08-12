@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\BopController;
 use App\Http\Controllers\ForgetPassword;
-use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CheckSubmittedAt;
-use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\UhsForms\ApplicationStatus;
 use App\Livewire\UhsForms\Dashboard;
 use App\Livewire\UhsForms\MultiStepForm;
@@ -16,12 +14,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        if ($user->hasRole(['admin', 'verifier'])) {
-            return redirect()->route('admin.dashboard');
-        }
-
         return redirect('/form');
     }
 
@@ -32,9 +24,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        if ($user->hasRole(['admin', 'verifier'])) {
-            return redirect()->route('admin.dashboard');
-        }
         if ($user->submitted_at) {
             return redirect()->route('uhs-form-dashboard');
         }
@@ -55,7 +44,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/challan/download', [BopController::class, 'createChallan'])->name('download.challan');
     });
 
-    Route::get('/admin/dashboard', AdminDashboard::class)->middleware([AdminMiddleware::class])->name('admin.dashboard');
 });
 
 Route::get('/forgot-password', function () {
