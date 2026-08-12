@@ -36,7 +36,7 @@ class Preferences extends Component
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
-            $this->emit('validationFailed');
+            $this->dispatch('validationFailed');
 
             throw $e;
         }

@@ -53,7 +53,7 @@ class Submit extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             $message = collect($e->validator->errors()->all())->first() ?? __('Please correct the highlighted fields.');
             $this->dialog()->error(__('Validation Error'), __($message))->send();
-            $this->emit('validationFailed');
+            $this->dispatch('validationFailed');
         } catch (\Exception $e) {
             $this->dialog()->error(__('Submission Failed'), __('An unexpected error occurred. Please try again later.'))->send();
             report($e);
