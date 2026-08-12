@@ -104,9 +104,18 @@
     <main class="flex-1 md:ml-80 min-h-screen z-10 font-inter">
         <!-- Fixed Glassmorphic Top Navigation Header -->
         <header class="hidden md:flex fixed top-0 left-80 right-0 h-20 z-30 backdrop-blur-xl border-b border-slate-800/80 px-8 items-center justify-between transition-all">
-            <div>
-                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Active Module</span>
-                <h2 class="text-xl font-bold uppercase tracking-tight">Step {{ $currentStep }}: {{ $steps[$currentStep]['name'] ?? '' }}</h2>
+            <div class="flex items-center gap-4">
+                @if($currentStep > 1)
+                    <button wire:click="goToStep({{ $currentStep - 1 }})" class="px-3 py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        <span>Back</span>
+                    </button>
+                @endif
+
+                <div>
+                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Active Module</span>
+                    <h2 class="text-xl font-bold uppercase tracking-tight">Step {{ $currentStep }}: {{ $steps[$currentStep]['name'] ?? '' }}</h2>
+                </div>
             </div>
             
             <div class="flex items-center space-x-3">
