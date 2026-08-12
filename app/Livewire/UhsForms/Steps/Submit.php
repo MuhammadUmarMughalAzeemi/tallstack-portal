@@ -26,25 +26,38 @@ class Submit extends Component
 
     public function submit()
     {
-        $this->validate([
-            'declaration' => ['accepted'],
-        ]);
+        try {
+            $this->validate([
+                'declaration' => ['accepted'],
+            ]);
 
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
 
-        UserSubmission::updateOrCreate(['user_id' => $user->id], [
-            'declaration' => $this->declaration,
-            'submitted_at' => now(),
-        ]);
+            UserSubmission::updateOrCreate(['user_id' => $user->id], [
+                'declaration' => $this->declaration,
+                'submitted_at' => now(),
+            ]);
 
-        $user->update([
-            'submitted_at' => now(),
-            'accepted_terms_and_conditions' => true,
-        ]);
+            $user->update([
+                'submitted_at' => now(),
+                'accepted_terms_and_conditions' => true,
+            ]);
 
-        $this->dispatch('completeStep', 'step8Completed');
-        $this->redirect(route('uhs-form-dashboard'));
+            $this->dispatch('completeStep', 'step8Completed');
+
+            $this->dialog()->success(__('Submitted'), __('Your application has been submitted successfully.'))->send();
+
+            $this->redirect(route('uhs-form-dashboard'));
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $message = collect($e->validator->errors()->all())->first() ?? __('Please correct the highlighted fields.');
+            $this->dialog()->error(__('Validation Error'), __($message))->send();
+            $this->emit('validationFailed');
+        } catch (\Exception $e) {
+            $this->dialog()->error(__('Submission Failed'), __('An unexpected error occurred. Please try again later.'))->send();
+            report($e);
+        }
     }
 
     public function render()
