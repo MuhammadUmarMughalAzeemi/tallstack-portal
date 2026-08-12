@@ -4,10 +4,14 @@ namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\Program;
 use App\Models\SeatCategory;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use TallStackUi\Traits\Interactions;
 
 class Programs extends Component
 {
+    use Interactions;
+
     public $seatCategories = [];
     public $programPriority;
     public $affirmation = 0;
@@ -37,7 +41,15 @@ class Programs extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 

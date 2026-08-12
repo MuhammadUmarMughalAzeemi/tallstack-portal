@@ -3,11 +3,14 @@
 namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\Media;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use TallStackUi\Traits\Interactions;
 
 class DocsAffidavit extends Component
 {
+    use Interactions;
     use WithFileUploads;
 
     public $cnic;
@@ -63,7 +66,15 @@ class DocsAffidavit extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
@@ -85,8 +96,6 @@ class DocsAffidavit extends Component
 
         $this->dispatch('completeStep', 'step6Completed');
         $this->dispatch('goToStep', 7);
-
-        $this->redirect(route('uhs-form-dashboard'));
     }
 
     public function render()

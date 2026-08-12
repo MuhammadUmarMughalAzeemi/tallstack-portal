@@ -30,13 +30,20 @@ class Documents extends Component
 
     public function save()
     {
-        $this->validate([
-            'id_proof' => 'required|image|max:2048', // 2MB Max
-            'transcript' => 'required|mimes:pdf,jpg,png|max:5120', // 5MB Max
-        ], [], [
-            'id_proof' => 'identity proof',
-            'transcript' => 'academic transcript',
-        ]);
+        try {
+            $this->validate([
+                'id_proof' => 'required|image|max:2048', // 2MB Max
+                'transcript' => 'required|mimes:pdf,jpg,png|max:5120', // 5MB Max
+            ], [], [
+                'id_proof' => 'identity proof',
+                'transcript' => 'academic transcript',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $idPath = $this->id_proof->store('documents/ids', 'public');
         $transcriptPath = $this->transcript->store('documents/transcripts', 'public');

@@ -30,12 +30,19 @@ class Education extends Component
 
     public function save()
     {
-        $this->validate([
-            'degree' => ['required', 'string', 'max:100'],
-            'institution' => ['required', 'string', 'max:255'],
-            'graduation_year' => ['required', 'numeric', 'min:1900', 'max:2030'],
-            'cgpa' => ['required', 'numeric', 'min:0', 'max:4.0'],
-        ]);
+        try {
+            $this->validate([
+                'degree' => ['required', 'string', 'max:100'],
+                'institution' => ['required', 'string', 'max:255'],
+                'graduation_year' => ['required', 'numeric', 'min:1900', 'max:2030'],
+                'cgpa' => ['required', 'numeric', 'min:0', 'max:4.0'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $data = [
             'degree' => $this->degree,

@@ -5,6 +5,8 @@
     </div>
 
     <form wire:submit="submit" class="space-y-6">
+    @include('livewire.partials.validation-errors')
+    <div class="p-1"></div>
         <!-- Test Type Selection -->
         <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Select Test Type</label>

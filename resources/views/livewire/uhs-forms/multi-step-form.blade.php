@@ -51,12 +51,15 @@
                 @php
                     $isActive = $currentStep == $stepNumber;
                     $isCompleted = $step['completed'];
+                    $isUnlocked = $stepNumber <= $currentStep || ($stepNumber === 1) || ($steps[$stepNumber - 1]['completed'] ?? false);
                 @endphp
 
                 <button
+                    @if(! $isUnlocked) disabled @endif
                     wire:click="goToStep({{ $stepNumber }})"
                     class="w-full text-left group relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300 
-                    {{ $isActive ? 'bg-indigo-600/20 border border-indigo-500/40 shadow-lg shadow-indigo-600/10 translate-x-1' : 'hover:bg-slate-800/40 border border-transparent' }}"
+                    {{ $isActive ? 'bg-indigo-600/20 border border-indigo-500/40 shadow-lg shadow-indigo-600/10 translate-x-1' : 'hover:bg-slate-800/40 border border-transparent' }}
+                    {{ ! $isUnlocked ? 'opacity-50 cursor-not-allowed' : '' }}"
                 >
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300
                         {{ $isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/40' : ($isCompleted ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400') }}

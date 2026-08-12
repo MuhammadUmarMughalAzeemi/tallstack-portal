@@ -28,11 +28,18 @@ class Preferences extends Component
 
     public function save()
     {
-        $this->validate([
-            'program' => ['required', 'string'],
-            'study_mode' => ['required', 'string'],
-            'campus' => ['required', 'string'],
-        ]);
+        try {
+            $this->validate([
+                'program' => ['required', 'string'],
+                'study_mode' => ['required', 'string'],
+                'campus' => ['required', 'string'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $data = [
             'program' => $this->program,

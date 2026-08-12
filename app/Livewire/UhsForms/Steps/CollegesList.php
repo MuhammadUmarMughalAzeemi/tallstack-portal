@@ -5,10 +5,14 @@ namespace App\Livewire\UhsForms\Steps;
 use App\Models\College;
 use App\Models\MphillPhdSubjects;
 use App\Models\TrainingProgram;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use TallStackUi\Traits\Interactions;
 
 class CollegesList extends Component
 {
+    use Interactions;
+
     public $selectPhdSubject;
     public $selectMphilSubject = [];
     public $selectMasterSubject;
@@ -19,6 +23,13 @@ class CollegesList extends Component
     public int $mphilId = 2;
     public int $masterId = 3;
     public int $certificateId = 4;
+
+    protected function rules(): array
+    {
+        return [
+            // At least one preference must be selected across Mphil, Phd, Master, or Training Programs
+        ];
+    }
 
     public function mount(): void
     {
@@ -44,6 +55,13 @@ class CollegesList extends Component
 
     public function submit(): void
     {
+        if (empty($this->selectMphilSubject) && empty($this->selectPhdSubject) && empty($this->selectMasterSubject) && empty($this->selectDiplomaCertificateSubject) && empty($this->selectTrainingPrograms)) {
+            $this->toast()->error('Please select at least one program or specialty preference.')->send();
+            $this->addError('preferences', 'Please select at least one program or specialty preference.');
+
+            return;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
         $userId = $user->id;

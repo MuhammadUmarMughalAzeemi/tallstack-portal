@@ -28,11 +28,18 @@ class Address extends Component
 
     public function save()
     {
-        $this->validate([
-            'address' => ['required', 'string', 'min:5', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
-            'postal_code' => ['required', 'string', 'min:4', 'max:15'],
-        ]);
+        try {
+            $this->validate([
+                'address' => ['required', 'string', 'min:5', 'max:255'],
+                'city' => ['required', 'string', 'max:100'],
+                'postal_code' => ['required', 'string', 'min:4', 'max:15'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $data = [
             'address' => $this->address,

@@ -42,6 +42,10 @@
         </div>
     </div>
 
+    <div class="space-y-4">
+        @error('preferences') <span class="text-xs text-rose-400 block p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl">{{ $message }}</span> @enderror
+    </div>
+
     <div class="flex justify-end pt-6 border-t border-slate-800">
         <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2">
             <span>Save & Proceed to Documents Upload</span>

@@ -8,11 +8,14 @@ use App\Models\Gender;
 use App\Models\Nationality;
 use App\Models\PersonalDetail;
 use App\Models\ResidenceArea;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use TallStackUi\Traits\Interactions;
 
 class PersonalDetails extends Component
 {
+    use Interactions;
     use WithFileUploads;
 
     public $image;
@@ -39,6 +42,7 @@ class PersonalDetails extends Component
     {
         return [
             'name'            => 'required|string|max:255',
+            'fatherName'      => 'required|string|max:255',
             'motherName'      => 'required|string|max:255',
             'dob'             => 'required|date',
             'mobileNumber'    => 'required|string',
@@ -47,9 +51,11 @@ class PersonalDetails extends Component
             'genderId'        => 'required',
             'residenceId'     => 'required',
             'address'         => 'required|string',
+            'domicile'        => 'required',
             'city'            => 'required|string',
             'country'         => 'required|string',
             'cnic'            => 'required',
+            'cnic_passport'   => 'required|string',
             'nationalityId'   => 'required',
         ];
     }
@@ -89,7 +95,15 @@ class PersonalDetails extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 

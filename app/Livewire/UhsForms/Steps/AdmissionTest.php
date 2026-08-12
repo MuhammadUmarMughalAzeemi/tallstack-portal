@@ -4,10 +4,14 @@ namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\AdmissionTest as AdmissionTestModel;
 use App\Models\MdcatCenter;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use TallStackUi\Traits\Interactions;
 
 class AdmissionTest extends Component
 {
+    use Interactions;
+
     public int $selectedExam = 1;
     public $mdCatCenter;
     public $mdCatObtainedMarks;
@@ -100,7 +104,15 @@ class AdmissionTest extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 

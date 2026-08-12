@@ -26,3 +26,34 @@
     --color-primary-900: #000000;
     --color-primary-950: #000000;
 }
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+    border-color: rgb(244 63 94) !important;
+    box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.2);
+    background-color: rgba(127, 29, 29, 0.04);
+}
+
+input[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus {
+    border-color: rgb(251 113 133) !important;
+    box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.18);
+}
+
+[wire\:errors] .text-rose-400,
+.text-rose-400,
+.text-red-500,
+.text-red-600 {
+    color: rgb(251 113 133) !important;
+    font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    input[aria-invalid="true"],
+    select[aria-invalid="true"],
+    textarea[aria-invalid="true"] {
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+}

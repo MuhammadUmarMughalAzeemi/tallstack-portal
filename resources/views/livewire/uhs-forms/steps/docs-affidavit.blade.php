@@ -1,4 +1,5 @@
 <form wire:submit="submit" class="space-y-6">
+    @include('livewire.partials.validation-errors')
     <div class="border-b border-slate-800 pb-4">
         <h2 class="text-xl font-bold text-slate-100">Step 5: Document Uploads & Affidavit</h2>
         <p class="text-slate-400 text-sm">Upload clear scanned copies (JPG, PNG, PDF) of your original documents.</p>
@@ -64,9 +65,16 @@
     </div>
 
     <div class="flex justify-end pt-6 border-t border-slate-800">
-        <button type="submit" class="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-600/30 transition-all flex items-center space-x-2">
+        <button type="submit" wire:loading.attr="disabled" wire:target="submit" class="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-600/30 transition-all flex items-center space-x-2">
+            <span wire:loading.inline wire:target="submit" class="mr-2">
+                <svg class="w-4 h-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+            </span>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span>Submit Application Final</span>
+            <span wire:loading.remove.delay wire:target="submit">Submit Application Final</span>
+            <span wire:loading.delay wire:target="submit">Submitting...</span>
         </button>
     </div>
 </form>

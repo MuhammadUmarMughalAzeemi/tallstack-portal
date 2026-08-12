@@ -28,11 +28,18 @@ class Experience extends Component
 
     public function save()
     {
-        $this->validate([
-            'job_title' => ['required', 'string', 'max:100'],
-            'company' => ['required', 'string', 'max:100'],
-            'years_experience' => ['required', 'numeric', 'min:0', 'max:50'],
-        ]);
+        try {
+            $this->validate([
+                'job_title' => ['required', 'string', 'max:100'],
+                'company' => ['required', 'string', 'max:100'],
+                'years_experience' => ['required', 'numeric', 'min:0', 'max:50'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $data = [
             'job_title' => $this->job_title,

@@ -8,10 +8,14 @@ use App\Models\InstitutionType;
 use App\Models\MbbsPassed;
 use App\Models\Qualification;
 use App\Models\SscExamPassed;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use TallStackUi\Traits\Interactions;
 
 class Qualifications extends Component
 {
+    use Interactions;
+
     public $sscPassed;
     public $sscScienceSubjects;
     public $sscInstitutionType;
@@ -51,28 +55,28 @@ class Qualifications extends Component
     {
         return [
             'sscPassed'           => 'required',
-            'sscScienceSubjects'  => 'required',
+            'sscScienceSubjects'  => 'required|string',
             'sscInstitutionType'  => 'required',
             'sscBoard'            => 'required',
-            'sscPassingYear'      => 'required',
-            'sscMarksObtained'    => 'required|numeric',
-            'sscTotalMarks'       => 'required|numeric',
+            'sscPassingYear'      => 'required|digits:4',
+            'sscMarksObtained'    => 'required|numeric|min:0|lte:sscTotalMarks',
+            'sscTotalMarks'       => 'required|numeric|min:1',
 
             'hsscPassed'          => 'required',
-            'hsscScienceSubjects' => 'required',
+            'hsscScienceSubjects' => 'required|string',
             'hsscInstitutionType' => 'required',
             'hsscBoard'           => 'required',
-            'hsscPassingYear'     => 'required',
-            'hsscMarksObtained'   => 'required|numeric',
-            'hsscTotalMarks'      => 'required|numeric',
+            'hsscPassingYear'     => 'required|digits:4',
+            'hsscMarksObtained'   => 'required|numeric|min:0|lte:hsscTotalMarks',
+            'hsscTotalMarks'      => 'required|numeric|min:1',
 
             'mbbsPassed'          => 'required',
-            'mbbsScienceSubjects' => 'required',
+            'mbbsScienceSubjects' => 'required|string',
             'mbbsInstitutionType' => 'required',
             'mbbsBoard'           => 'required',
-            'mbbsPassingYear'     => 'required',
-            'mbbsMarksObtained'   => 'required|numeric',
-            'mbbsTotalMarks'      => 'required|numeric',
+            'mbbsPassingYear'     => 'required|digits:4',
+            'mbbsMarksObtained'   => 'required|numeric|min:0|lte:mbbsTotalMarks',
+            'mbbsTotalMarks'      => 'required|numeric|min:1',
         ];
     }
 
@@ -137,7 +141,15 @@ class Qualifications extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 

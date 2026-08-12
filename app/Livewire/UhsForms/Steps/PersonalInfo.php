@@ -3,6 +3,7 @@
 namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\UserPersonalInfo;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use TallStackUi\Traits\Interactions;
 
@@ -23,11 +24,18 @@ class PersonalInfo extends Component
 
     public function save()
     {
-        $this->validate([
-            'full_name' => ['required', 'string', 'min:3', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'min:10', 'max:20'],
-        ]);
+        try {
+            $this->validate([
+                'full_name' => ['required', 'string', 'min:3', 'max:255'],
+                'email' => ['required', 'email', 'max:255'],
+                'phone' => ['required', 'string', 'min:10', 'max:20'],
+            ]);
+        } catch (ValidationException $e) {
+            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->emit('validationFailed');
+
+            throw $e;
+        }
 
         $data = [
             'full_name' => $this->full_name,

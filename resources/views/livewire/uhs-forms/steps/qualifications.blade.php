@@ -1,4 +1,6 @@
 <form wire:submit="submit" class="space-y-8">
+    @include('livewire.partials.validation-errors')
+    <div class="p-1"></div>
     <div class="border-b border-slate-800 pb-4">
         <h2 class="text-xl font-bold text-slate-100">Step 3: Academic Qualifications</h2>
         <p class="text-slate-400 text-sm">Enter your academic background details starting from Matric / SSC up to Graduation / MBBS.</p>
