@@ -1,7 +1,7 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
-            <h2 class="text-xl font-bold text-slate-100 uppercase tracking-tight">Step 07: Review Application Summary</h2>
+            <h2 class="text-xl font-bold text-slate-100 uppercase tracking-tight">Step 6: Review Application Summary</h2>
             <p class="text-xs text-slate-400">Review your information before final submission. Click "Edit" on any section to modify your details.</p>
         </div>
         <div class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-full text-xs font-bold">

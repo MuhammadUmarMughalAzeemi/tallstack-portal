@@ -13,8 +13,23 @@ class Preferences extends Component
     public $program;
     public $study_mode;
     public $campus;
+    public $searchCollege = '';
 
-    public function mount($data)
+    // Mock college list with long names (replace with DB query if needed)
+    private $colleges = [
+        'University Medical & Dental College, Faisalabad (For Women Only) (University of Faisalabad)',
+        'Aga Khan University Medical College, Karachi',
+        'Allama Iqbal Medical College, Lahore',
+        'Dow University of Health Sciences, Karachi',
+        'Khyber Medical University, Peshawar',
+        'Punjab Medical College, Faisalabad',
+        'Shaheed Zulfiqar Ali Bhutto Medical University (SZABMU), Islamabad',
+        'Liaquat University of Medical & Health Sciences, Hyderabad',
+        'Baqai Medical University, Karachi',
+        'Fatima Jinnah Medical University, Lahore',
+    ];
+
+    public function mount($data = [])
     {
         $this->program = $data['program'] ?? '';
         $this->study_mode = $data['study_mode'] ?? '';
@@ -35,7 +50,7 @@ class Preferences extends Component
                 'campus' => ['required', 'string'],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->dialog()->error(__('Validation Error'), __('Please correct the highlighted fields before continuing.'))->send();
+            $this->dialog()->error(__('Validation Error'), __('Please select all required fields.'))->send();
             $this->dispatch('validationFailed');
 
             throw $e;
@@ -50,7 +65,7 @@ class Preferences extends Component
         UserPreference::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 6, data: $data);
-        $this->toast()->success('Step 6: Preferences saved.')->send();
+        $this->toast()->success('Step 7: Preferences saved.')->send();
     }
 
     public function render()

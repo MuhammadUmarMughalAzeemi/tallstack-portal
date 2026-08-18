@@ -57,3 +57,23 @@ textarea[aria-invalid="true"]:focus {
         transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 }
+
+/* ── SortableJS drag states ── */
+.sortable-ghost {
+    opacity: 0.35;
+    background: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+    border-radius: 0.75rem;
+}
+
+.sortable-chosen {
+    background: rgba(168, 85, 247, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+    box-shadow: 0 8px 30px rgba(168, 85, 247, 0.3);
+    border-color: rgba(168, 85, 247, 0.6) !important;
+}

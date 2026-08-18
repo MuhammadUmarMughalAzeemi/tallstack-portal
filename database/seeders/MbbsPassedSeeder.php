@@ -9,7 +9,7 @@ class MbbsPassedSeeder extends Seeder
 {
     public function run(): void
     {
-        $exams = ['MBBS', 'BDS', 'Pharm-D', 'BS Nursing', 'Other Allied Health'];
+        $exams = ['MBBS', 'BDS', 'Pharm-D', 'BS Nursing','B.Sc(Hons)','Post RN', 'MS'];
         foreach ($exams as $key => $name) {
             MbbsPassed::updateOrCreate(
                 ['id' => $key + 1],

@@ -1,6 +1,5 @@
-<div class="bg-white/90 backdrop-blur-xl rounded-[32px] p-8 md:p-10 shadow-2xl shadow-slate-200/50 border border-white">
+<div class="bg-white/90 backdrop-blur-xl rounded-[32px] p-8 md:p-10 shadow-2xl shadow-slate-200/50">
     <div class="space-y-8">
-        @include('livewire.partials.validation-errors')
         <div class="text-center">
             <div class="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <x-icon name="user" class="w-8 h-8 text-primary-600" />

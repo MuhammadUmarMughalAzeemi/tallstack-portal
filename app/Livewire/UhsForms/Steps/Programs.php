@@ -13,18 +13,15 @@ class Programs extends Component
 {
     use Interactions;
 
-    public $seatCategories = [];
+    public $selectedSeatCategory;
     public $programPriority;
-    public $affirmation = 0;
-    public $foreigner = 0;
     public $pmdcNo;
 
     protected function rules(): array
     {
         return [
-            'seatCategories' => 'required|array|min:1',
-            'affirmation'    => 'required|in:1',
-            'pmdcNo'         => 'required|string',
+            'selectedSeatCategory' => 'required',
+            'pmdcNo'               => 'required|string',
         ];
     }
 
@@ -35,11 +32,9 @@ class Programs extends Component
             return;
         }
 
-        $this->seatCategories  = $user->seatCategories->pluck('id')->toArray();
-        $this->programPriority = $user->program_priority;
-        $this->affirmation     = $user->affirmation ?? 0;
-        $this->foreigner       = $user->foreigner ?? 0;
-        $this->pmdcNo          = $user->pmdc_pnmc;
+        $this->selectedSeatCategory = $user->seatCategories->first()?->id;
+        $this->programPriority      = $user->program_priority;
+        $this->pmdcNo               = $user->pmdc_pnmc;
     }
 
     public function submit(): void
@@ -56,12 +51,10 @@ class Programs extends Component
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $user->seatCategories()->sync($this->seatCategories);
+        $user->seatCategories()->sync([$this->selectedSeatCategory]);
         $user->update([
-            'program_id'       => $this->seatCategories[0] ?? null,
+            'program_id'       => $this->selectedSeatCategory,
             'program_priority' => 1,
-            'affirmation'      => $this->affirmation,
-            'foreigner'        => $this->foreigner,
             'pmdc_pnmc'        => $this->pmdcNo,
         ]);
 

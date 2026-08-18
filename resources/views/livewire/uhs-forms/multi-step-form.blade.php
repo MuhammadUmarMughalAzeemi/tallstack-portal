@@ -6,17 +6,18 @@
 
     <!-- Mobile Header Navigation -->
     <div class="md:hidden bg-slate-900/90 backdrop-blur-xl border-b border-slate-800/80 p-4 sticky top-0 z-50">
+        @php $stepDisplayMap = [1=>1, 2=>2, 3=>3, 5=>4, 6=>5, 7=>6, 8=>7]; $mobileDisplayNum = $stepDisplayMap[$currentStep] ?? $currentStep; @endphp
         <div class="flex items-center justify-between mb-2">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">UHS</div>
                 <h1 class="text-xs font-black tracking-wider uppercase">Post Graduate Portal</h1>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="text-[11px] font-bold text-indigo-400 font-inter">{{ round(($currentStep / 8) * 100) }}%</div>
+                <div class="text-[11px] font-bold text-indigo-400 font-inter">{{ round(($mobileDisplayNum / 7) * 100) }}%</div>
             </div>
         </div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-700" style="width: {{ ($currentStep / 8) * 100 }}%"></div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-700" style="width: {{ ($mobileDisplayNum / 7) * 100 }}%"></div>
         </div>
     </div>
 
@@ -34,32 +35,37 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="space-y-1.5">
                 <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <span>Progress</span>
-                    <span class="text-indigo-400">{{ round(($currentStep / 8) * 100) }}%</span>
+                    @php $stepDisplayMap = [1=>1, 2=>2, 3=>3, 5=>4, 6=>5, 7=>6, 8=>7]; $sidebarDisplayNum = $stepDisplayMap[$currentStep] ?? $currentStep; @endphp
+                    <span class="text-indigo-400">{{ round(($sidebarDisplayNum / 7) * 100) }}%</span>
                 </div>
                 <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all duration-700" style="width: {{ ($currentStep / 8) * 100 }}%"></div>
+                    <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all duration-700" style="width: {{ ($sidebarDisplayNum / 7) * 100 }}%"></div>
                 </div>
             </div>
         </div>
 
         <nav class="flex-1 px-4 py-4 overflow-y-auto custom-scrollbar space-y-1">
+            @php $displayNum = 0; @endphp
             @foreach($steps as $stepNumber => $step)
                 @php
+                    $displayNum++;
                     $isActive = $currentStep == $stepNumber;
                     $isCompleted = $step['completed'];
                     $isUnlocked = $stepNumber <= $currentStep || ($stepNumber === 1) || ($steps[$stepNumber - 1]['completed'] ?? false);
+                    // Show all steps: completed, active, unlocked, and next unlocked step
+                    $showStep = true;
                 @endphp
 
+                @if($showStep)
                 <button
                     @if(! $isUnlocked) disabled @endif
                     wire:click="goToStep({{ $stepNumber }})"
-                    class="w-full text-left group relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300 
-                    {{ $isActive ? 'bg-indigo-600/20 border border-indigo-500/40 shadow-lg shadow-indigo-600/10 translate-x-1' : 'hover:bg-slate-800/40 border border-transparent' }}
-                    {{ ! $isUnlocked ? 'opacity-50 cursor-not-allowed' : '' }}"
+                    class="w-full text-left group relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300
+                    {{ $isActive ? 'bg-indigo-600/20 border border-indigo-500/40 shadow-lg shadow-indigo-600/10 translate-x-1' : 'hover:bg-slate-800/40 border border-transparent' }}"
                 >
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300
                         {{ $isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/40' : ($isCompleted ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400') }}
@@ -67,14 +73,14 @@
                         @if($isCompleted && !$isActive)
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         @else
-                            {{ $stepNumber }}
+                            {{ $displayNum }}
                         @endif
                     </div>
 
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <p class="text-[9px] font-bold uppercase tracking-widest {{ $isActive ? 'text-indigo-400' : 'text-slate-500' }}">
-                                STEP 0{{ $stepNumber }}
+                                STEP {{ str_pad($displayNum, 2, '0', STR_PAD_LEFT) }}
                             </p>
                             @if($isCompleted && !$isActive)
                                 <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest hover:underline">Edit</span>
@@ -85,6 +91,7 @@
                         </p>
                     </div>
                 </button>
+                @endif
             @endforeach
         </nav>
 
@@ -106,18 +113,24 @@
         <header class="hidden md:flex fixed top-0 left-80 right-0 h-20 z-30 backdrop-blur-xl border-b border-slate-800/80 px-8 items-center justify-between transition-all">
             <div class="flex items-center gap-4">
                 @if($currentStep > 1)
-                    <button wire:click="goToStep({{ $currentStep - 1 }})" class="px-3 py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold transition-all flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        <span>Back</span>
-                    </button>
+                    @php
+                        // Step 4 bypassed — back from step 5 goes to step 3
+                        $prevStep = $currentStep - 1;
+                        if ($prevStep === 4) $prevStep = 3;
+                    @endphp
                 @endif
 
                 <div>
                     <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Active Module</span>
-                    <h2 class="text-xl font-bold uppercase tracking-tight">Step {{ $currentStep }}: {{ $steps[$currentStep]['name'] ?? '' }}</h2>
+                    @php
+                        // Map internal step number to display number (step 4 skipped)
+                        $stepDisplayMap = [1=>1, 2=>2, 3=>3, 5=>4, 6=>5, 7=>6, 8=>7];
+                        $displayStepNum = $stepDisplayMap[$currentStep] ?? $currentStep;
+                    @endphp
+                    <h2 class="text-xl font-bold uppercase tracking-tight">Step {{ $displayStepNum }}: {{ $steps[$currentStep]['name'] ?? 'Loading...' }}</h2>
                 </div>
             </div>
-            
+
             <div class="flex items-center space-x-3">
                 <x-user-theme-toggle />
                 <a href="{{ route('uhs-form-dashboard') }}" class="px-4 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-700 text-xs font-semibold transition-all">
@@ -132,15 +145,17 @@
         <!-- Dynamic Step Components Workspace -->
         <div class="pt-24 pb-12 px-4 md:px-8">
             <div :class="$store.portalTheme.theme === 'light' ? 'bg-white/90 border-slate-200 shadow-xl' : 'bg-slate-900/80 border-slate-800 shadow-2xl'"
-                 class="max-w-5xl mx-auto backdrop-blur-2xl border rounded-3xl p-6 md:p-8 transition-colors duration-500">
+                 class="max-w-8xl mx-auto backdrop-blur-2xl border rounded-3xl p-6 md:p-8 transition-colors duration-500">
             @if($currentStep == 1)
                 @livewire('uhs-forms.steps.programs', key('step-1'))
             @elseif($currentStep == 2)
                 @livewire('uhs-forms.steps.personal-details', key('step-2'))
             @elseif($currentStep == 3)
                 @livewire('uhs-forms.steps.qualifications', key('step-3'))
+            {{-- Step 4 (Admission Test) bypassed — preserved for future use
             @elseif($currentStep == 4)
                 @livewire('uhs-forms.steps.admission-test', key('step-4'))
+            --}}
             @elseif($currentStep == 5)
                 @livewire('uhs-forms.steps.colleges-list', key('step-5'))
             @elseif($currentStep == 6)

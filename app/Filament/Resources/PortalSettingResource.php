@@ -31,35 +31,54 @@ class PortalSettingResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('🎓 Student Portal Theme Settings')
-                    ->description('Configure the theme, presets, and custom @theme color palettes for candidate multi-step application forms and student dashboards.')
-                    ->components([
-                        Select::make('active_theme')
-                            ->label('Student Default Preset')
+                Section::make('⚡ Admin Panel Skeuo-Glass Theme')
+                    ->description('Configure glassmorphic theme for Filament admin interface. Can also use custom palette colors.')
+                    ->schema([
+                        Select::make('admin_theme')
+                            ->label('Admin Glassmorphism Preset')
                             ->options([
-                                'custom' => '⚙️ Custom Color Palette / Custom @theme CSS',
+                                'custom-glass' => '✨ Custom Glass (Uses Custom Palette)',
+                                'frost-sapphire' => '❄️ Frost Sapphire',
+                                'emerald-glass' => '💚 Emerald Glass',
+                                'obsidian-crystal' => '⚫ Obsidian Crystal',
+                                'luxe-gold' => '🏆 Luxe Gold Glass',
+                                'rose-quartz' => '🌸 Rose Quartz',
+                            ])
+                            ->default('frost-sapphire')
+                            ->helperText('Select "Custom Glass" to apply your @theme colors to the admin panel with glassmorphism effects.'),
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
+                Section::make('🎓 Student Portal Theme Settings')
+                    ->description('Configure theme preset for candidate application forms and student dashboards.')
+                    ->schema([
+                        Select::make('active_theme')
+                            ->label('Student Theme Preset')
+                            ->options([
+                                'custom' => '⚙️ Use Custom Palette (from above)',
+                                'default' => '🔵 Default Blue Theme',
                             ])
                             ->default('custom')
+                            ->helperText('Select "Use Custom Palette" to apply your @theme colors to the student portal.')
                             ->nullable(),
-
-                        Select::make('admin_theme')
-                            ->label('Admin Panel Skeuo-Glass Theme')
-                            ->options([
-                                'custom-glass' => '✨ Custom @theme Glass (Auto-Generated)',
-                                'frost-sapphire' => 'Frost Sapphire',
-                                'emerald-glass' => 'Emerald Glass',
-                                'obsidian-crystal' => 'Obsidian Crystal',
-                                'luxe-gold' => 'Luxe Gold Glass',
-                                'rose-quartz' => 'Rose Quartz',
-                            ])
-                            ->default('frost-sapphire'),
-
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
+                Section::make('🎨 Custom @theme Color Palette (Shared - Student & Admin)')
+                    ->description('Define a custom color palette that can be used across both Student Portal and Admin Panel. This palette automatically generates CSS variables for your custom colors.')
+                    ->schema([
                         Textarea::make('custom_css')
-                            ->label('Student Custom @theme Color Palette Code')
-                            ->placeholder("@theme {\n  /* Hex */\n  --color-gold-50: #fff5e9;\n  --color-gold-500: #b08516;\n  --color-gold-950: #1b1201;\n\n  /* OKLCH */\n  --color-brand-500: oklch(0.65 0.15 240);\n\n  /* HSL */\n  --color-ocean-500: hsl(200, 80%, 50%);\n\n  /* RGB */\n  --color-coral-500: rgb(255, 127, 80);\n}")
-                            ->helperText('Paste any custom @theme block with 50-950 color palette scales. Supports Hex, OKLCH, HSL, RGB formats. Applied to Student Portal!')
-                            ->rows(8),
-                    ])->columns(1),
+                            ->label('Custom Color Palette Code')
+                            ->placeholder("@theme {\n  /* Hex Format */\n  --color-brand-50: #f0f9ff;\n  --color-brand-100: #e0f2fe;\n  --color-brand-200: #bae6fd;\n  --color-brand-300: #7dd3fc;\n  --color-brand-400: #38bdf8;\n  --color-brand-500: #0ea5e9;\n  --color-brand-600: #0284c7;\n  --color-brand-700: #0369a1;\n  --color-brand-800: #075985;\n  --color-brand-900: #0c4a6e;\n  --color-brand-950: #082f49;\n\n  /* OKLCH Format */\n  --color-accent-500: oklch(0.65 0.15 240);\n\n  /* HSL Format */\n  --color-ocean-500: hsl(200, 80%, 50%);\n\n  /* RGB Format */\n  --color-coral-500: rgb(255, 127, 80);\n}")
+                            ->helperText('✨ Define custom colors with 50-950 scales. Works with Hex, OKLCH, HSL, RGB. Use these colors via: text-brand-500, bg-brand-100, etc.')
+                            ->rows(10)
+                            ->columnSpanFull(),
+                    ])
+                    ->columnSpanFull()
+                    ->collapsible()
+                    ->collapsed(false),
+
+
             ]);
     }
 
@@ -73,10 +92,11 @@ class PortalSettingResource extends Resource
                     ->color('info')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'custom' => 'Custom Palette',
+                        'default' => 'Default Blue',
                         default => ucfirst((string) $state),
                     }),
                 Tables\Columns\TextColumn::make('admin_theme')
-                    ->label('Admin Skeuo Theme')
+                    ->label('Admin Theme')
                     ->badge()
                     ->color('success')
                     ->formatStateUsing(fn ($state) => ucfirst(str_replace('-', ' ', (string) $state))),
@@ -90,7 +110,7 @@ class PortalSettingResource extends Resource
                     ->dateTime('d M Y H:i'),
             ])
             ->actions([
-                EditAction::make()->label('Configure Theme'),
+                EditAction::make()->label('Configure Themes'),
             ]);
     }
 

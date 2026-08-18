@@ -38,6 +38,7 @@ class PersonalDetails extends Component
     public $city;
     public $country;
     public $showInput = 0;
+    public $cnicTypeName; // Selected CNIC Type display name
 
     protected function rules(): array
     {
@@ -55,7 +56,6 @@ class PersonalDetails extends Component
             'domicile'        => 'required',
             'city'            => 'required|string',
             'country'         => 'required|string',
-            'cnic'            => 'required',
             'cnic_passport'   => 'required|string',
             'nationalityId'   => 'required',
         ];
@@ -75,6 +75,12 @@ class PersonalDetails extends Component
         $this->fatherName   = $user->father_name;
         $this->cnic         = $user->cnic_passport_id;
         $this->cnic_passport = $user->cnic_passport;
+
+        // Load CNIC Type name from registration
+        if ($this->cnic) {
+            $cnicType = CnicPassport::find($this->cnic);
+            $this->cnicTypeName = $cnicType?->name ?? 'Not Selected';
+        }
 
         $details = $user->personalDetails;
         if ($details) {
@@ -132,7 +138,6 @@ class PersonalDetails extends Component
                 'secondary_number'  => $this->secondaryNumber,
                 'city'              => $this->city,
                 'country'           => $this->country,
-                'showInput'         => $this->cnic,
             ]
         );
 

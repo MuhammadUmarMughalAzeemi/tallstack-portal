@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -23,7 +24,6 @@ use Filament\Panel;
  * @property string|null $password
  * @property string|null $plain_password
  * @property string|null $pmdc_pnmc
- * @property string|null $training_program_id
  * @property string|null $father_name
  * @property string|null $mobile_number
  * @property string|null $branch_code
@@ -44,28 +44,14 @@ use Filament\Panel;
  * @property float|null $aggregate_overseas
  * @property string|null $comments
  * @property \Illuminate\Support\Carbon|null $submitted_at
- * @property int|null $foreigner
  * @property int $is_completed
  * @property int $is_completed_email
  * @property string|null $step_one_data
  * @property bool $profile_step_1_completed
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Media|null $image
- * @property-read \App\Models\Media|null $userCnic
- * @property-read \App\Models\Media|null $userCnicBackSide
- * @property-read \App\Models\Media|null $userChallanImage
- * @property-read \App\Models\Media|null $userFatherCnic
- * @property-read \App\Models\Media|null $userFatherCnicBackSide
- * @property-read \App\Models\Media|null $userSignatureImage
- * @property-read \App\Models\Media|null $userColorPhoto
- * @property-read \App\Models\Media|null $userDisabilityPhoto
- * @property-read \App\Models\Media|null $userSchoolLeavingPhoto
- * @property-read \App\Models\Media|null $userProvisionalCertificatePhoto
- * @property-read \App\Models\Media|null $userDomicileCertificatePhoto
- * @property-read \App\Models\Media|null $userMdcatResultCardPhoto
- * @property-read \App\Models\Media|null $userMatricTranscriptPhoto
- * @property-read \App\Models\Media|null $userIntermediateTranscriptPhoto
+ *
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $getFirstMedia(string $collection)
  * @property-read \App\Models\PersonalDetail|null $personalDetails
  * @property-read \App\Models\Qualification|null $qualifications
  * @property-read \App\Models\AdmissionTest|null $admissionTest
@@ -83,11 +69,57 @@ use Filament\Panel;
  * @property-read \App\Models\UserPreference|null $preference
  * @property-read \App\Models\UserSubmission|null $submission
  */
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
     use HasFactory;
     use HasRoles;
     use Notifiable;
+    use InteractsWithMedia;
+
+    // ─── Spatie Media Collections ───────────────────────────────────────────
+    // Each constant is used as the collection name throughout the app.
+    // Single-file collections use ->singleFile() so uploading replaces previous.
+    // 'other-documents' is multi-file for user-defined additional uploads.
+
+    public const MEDIA_CNIC                     = 'cnic';
+    public const MEDIA_CNIC_BACK                = 'cnic-back';
+    public const MEDIA_FATHER_CNIC              = 'father-cnic';
+    public const MEDIA_FATHER_CNIC_BACK         = 'father-cnic-back';
+    public const MEDIA_PHOTO                    = 'photo';
+    public const MEDIA_SIGNATURE                = 'signature';
+    public const MEDIA_DOMICILE                 = 'domicile';
+    public const MEDIA_MATRIC_TRANSCRIPT        = 'matric-transcript';
+    public const MEDIA_INTERMEDIATE_TRANSCRIPT  = 'intermediate-transcript';
+    public const MEDIA_MDCAT_RESULT             = 'mdcat-result';
+    public const MEDIA_OTHER_DOCUMENTS          = 'other-documents';
+
+    /**
+     * Register all Spatie media collections.
+     * Called automatically by InteractsWithMedia.
+     */
+    public function registerMediaCollections(): void
+    {
+        // Identity Documents
+        $this->addMediaCollection(self::MEDIA_CNIC)->singleFile();
+        $this->addMediaCollection(self::MEDIA_CNIC_BACK)->singleFile();
+        $this->addMediaCollection(self::MEDIA_FATHER_CNIC)->singleFile();
+        $this->addMediaCollection(self::MEDIA_FATHER_CNIC_BACK)->singleFile();
+
+        // Personal
+        $this->addMediaCollection(self::MEDIA_PHOTO)->singleFile();
+        $this->addMediaCollection(self::MEDIA_SIGNATURE)->singleFile();
+
+        // Academic
+        $this->addMediaCollection(self::MEDIA_DOMICILE)->singleFile();
+        $this->addMediaCollection(self::MEDIA_MATRIC_TRANSCRIPT)->singleFile();
+        $this->addMediaCollection(self::MEDIA_INTERMEDIATE_TRANSCRIPT)->singleFile();
+        $this->addMediaCollection(self::MEDIA_MDCAT_RESULT)->singleFile();
+
+        // Other documents — multiple files, each with a custom name
+        $this->addMediaCollection(self::MEDIA_OTHER_DOCUMENTS);
+    }
+
+    // ─── Eloquent Relationships ─────────────────────────────────────────────
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -108,7 +140,6 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'plain_password',
         'pmdc_pnmc',
-        'training_program_id',
         'father_name',
         'mobile_number',
         'transaction_id',
@@ -127,7 +158,6 @@ class User extends Authenticatable implements FilamentUser
         'status',
         'comments',
         'submitted_at',
-        'foreigner',
         'is_paid',
         'cnic_passport',
         'cnic_passport_id',
@@ -151,92 +181,12 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'submitted_at' => 'datetime',
-            'password' => 'hashed',
-            'is_paid' => 'boolean',
-            'accepted_terms_and_conditions' => 'boolean',
+            'email_verified_at'              => 'datetime',
+            'submitted_at'                   => 'datetime',
+            'password'                       => 'hashed',
+            'is_paid'                        => 'boolean',
+            'accepted_terms_and_conditions'  => 'boolean',
         ];
-    }
-
-    public function image(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'avatar');
-    }
-
-    public function userCnic(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userCnic');
-    }
-
-    public function userCnicBackSide(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userCnicBackSide');
-    }
-
-    public function userChallanImage(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userChallanImage');
-    }
-
-    public function userFatherCnic(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userFatherCnic');
-    }
-
-    public function userFatherCnicAffidavit(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userFatherCnicAffidavit');
-    }
-
-    public function userFatherCnicBackSide(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userFatherCnicBackSide');
-    }
-
-    public function userSignatureImage(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'signature');
-    }
-
-    public function userColorPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userColorPhoto');
-    }
-
-    public function userDisabilityPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userDisabilityPhoto');
-    }
-
-    public function userSchoolLeavingPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userSchoolLeavingPhoto');
-    }
-
-    public function userProvisionalCertificatePhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userProvisionalCertificatePhoto');
-    }
-
-    public function userDomicileCertificatePhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userDomicileCertificatePhoto');
-    }
-
-    public function userMdcatResultCardPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userMdcatResultCardPhoto');
-    }
-
-    public function userMatricTranscriptPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userMatricTranscriptPhoto');
-    }
-
-    public function userIntermediateTranscriptPhoto(): MorphOne
-    {
-        return $this->morphOne(Media::class, 'mediaable')->where('collection', 'userIntermediateTranscriptPhoto');
     }
 
     public function program(): BelongsTo
@@ -286,12 +236,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(OTPS::class);
     }
 
-    public function training(): HasMany
-    {
-        return $this->hasMany(TrainingProgram::class);
-    }
-
-    // Multi-step form relations (reference pattern)
     public function personalInfo(): HasOne
     {
         return $this->hasOne(UserPersonalInfo::class);

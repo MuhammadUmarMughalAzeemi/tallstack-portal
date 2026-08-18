@@ -104,10 +104,15 @@ class AdmissionTest extends Component
             $this->mcatPassword       = $test->mcat_password;
 
             // Detect which exam type was previously saved
-            if ($test->md_cat_obtained_marks)  $this->selectedExam = 1;
-            elseif ($test->sat_biology_obtained_marks) $this->selectedExam = 2;
-            elseif ($test->ucat_obtained_marks) $this->selectedExam = 3;
-            elseif ($test->mcat_obtained_marks) $this->selectedExam = 4;
+            if ($test->md_cat_obtained_marks) {
+                $this->selectedExam = 1;
+            } elseif ($test->sat_biology_obtained_marks) {
+                $this->selectedExam = 2;
+            } elseif ($test->ucat_obtained_marks) {
+                $this->selectedExam = 3;
+            } elseif ($test->mcat_obtained_marks) {
+                $this->selectedExam = 4;
+            }
         }
     }
 

@@ -38,6 +38,12 @@ class UhsMainForm extends Component
     {
         $this->resetAllActive();
 
+        // Step 4 (Admission Test) is disabled for this project
+        // If navigating to step 4, redirect to step 5 instead
+        if ($step === 4) {
+            $step = 5;
+        }
+
         match ($step) {
             1 => $this->step1Active = true,
             2 => $this->step2Active = true,
@@ -80,12 +86,12 @@ class UhsMainForm extends Component
 
                 if ($user->qualifications) {
                     $this->completeStep('step3Completed');
-                    $this->goToStep(4);
+                    $this->completeStep('step4Completed'); // Auto-complete step 4 (bypassed)
+                    $this->goToStep(5);
                 }
 
                 if ($user->admissionTest) {
-                    $this->completeStep('step4Completed');
-                    $this->goToStep(5);
+                    // step4 is bypassed — kept for future use
                 }
 
                 if (! blank($user->mphillPhdSubjects)) {

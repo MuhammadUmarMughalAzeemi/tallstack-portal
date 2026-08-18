@@ -6,6 +6,7 @@ use App\Models\Boards;
 use App\Models\ExamPassed;
 use App\Models\InstitutionType;
 use App\Models\MbbsPassed;
+use App\Models\MphilExam;
 use App\Models\Qualification;
 use App\Models\SscExamPassed;
 use Illuminate\Support\Facades\Cache;
@@ -49,12 +50,14 @@ class Qualifications extends Component
     public $mphilMarksObtained;
     public $mphilTotalMarks;
 
+    public bool $isPhd = false; // True when user selected Ph.D. (seat category ID = 1)
+
     public bool $isExperience = false;
     public array $experiences = [];
 
     protected function rules(): array
     {
-        return [
+        $rules = [
             'sscPassed'           => 'required',
             'sscScienceSubjects'  => 'required|string',
             'sscInstitutionType'  => 'required',
@@ -79,13 +82,42 @@ class Qualifications extends Component
             'mbbsMarksObtained'   => 'required|numeric|min:0|lte:mbbsTotalMarks',
             'mbbsTotalMarks'      => 'required|numeric|min:1',
         ];
+
+        // M.Phil fields are required only when PhD is selected
+        if ($this->isPhd) {
+            $rules['mphilPassed']          = 'required';
+            $rules['mphilScienceSubjects'] = 'required|string';
+            $rules['mphilInstitutionType'] = 'required';
+            $rules['mphilBoard']           = 'required';
+            $rules['mphilPassingYear']     = 'required|digits:4';
+            $rules['mphilMarksObtained']   = 'required|numeric|min:0';
+            $rules['mphilTotalMarks']      = 'required|numeric|min:1';
+        }
+
+        // Experience fields are required when "Add Experience" is checked
+        if ($this->isExperience) {
+            $rules['experiences']                      = 'required|array|min:1';
+            $rules['experiences.*.institute']          = 'required|string';
+            $rules['experiences.*.designation']        = 'required|string';
+            $rules['experiences.*.fromDate']           = 'required|date';
+            $rules['experiences.*.toDate']             = 'required|date|after_or_equal:experiences.*.fromDate';
+        }
+
+        return $rules;
     }
 
     public function mount(): void
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        if (! $user || ! $user->qualifications) {
+        if (! $user) {
+            return;
+        }
+
+        // PhD = seat category ID 1 (fixed by SeatCategorySeeder)
+        $this->isPhd = $user->seatCategories->first()?->id === 1;
+
+        if (! $user->qualifications) {
             return;
         }
 
@@ -141,6 +173,21 @@ class Qualifications extends Component
     {
         unset($this->experiences[$index]);
         $this->experiences = array_values($this->experiences);
+    }
+
+    // Triggered when "Add Experience" checkbox changes
+    public function updatedIsExperience(bool $value): void
+    {
+        if ($value) {
+            // Auto-add one empty row when checked
+            $this->experiences = [
+                ['fromDate' => '', 'toDate' => '', 'institute' => '', 'designation' => ''],
+            ];
+        } else {
+            // Clear all rows when unchecked
+            $this->experiences = [];
+            $this->resetErrorBag();
+        }
     }
 
     public function back(): void
@@ -202,22 +249,26 @@ class Qualifications extends Component
         );
 
         $this->dispatch('completeStep', 'step3Completed');
-        $this->dispatch('goToStep', 4);
+        // Step 4 (Admission Test) is bypassed for this project — skip directly to Step 5
+        $this->dispatch('completeStep', 'step4Completed');
+        $this->dispatch('goToStep', 5);
     }
 
     public function render()
     {
         // All exam/board/institution data is admin-managed — safe to cache for 24 hours
-        $sscExams        = Cache::remember('lookup_ssc_exams', 86400, fn () => SscExamPassed::all());
-        $hsscExams       = Cache::remember('lookup_hssc_exams', 86400, fn () => ExamPassed::all());
-        $mbbsExams       = Cache::remember('lookup_mbbs_exams', 86400, fn () => MbbsPassed::all());
-        $boards          = Cache::remember('lookup_boards', 86400, fn () => Boards::all());
+        $sscExams         = Cache::remember('lookup_ssc_exams', 86400, fn () => SscExamPassed::all());
+        $hsscExams        = Cache::remember('lookup_hssc_exams', 86400, fn () => ExamPassed::all());
+        $mbbsExams        = Cache::remember('lookup_mbbs_exams', 86400, fn () => MbbsPassed::all());
+        $mphilExams       = Cache::remember('lookup_mphil_exams', 86400, fn () => MphilExam::all());
+        $boards           = Cache::remember('lookup_boards', 86400, fn () => Boards::all());
         $institutionTypes = Cache::remember('lookup_institution_types', 86400, fn () => InstitutionType::all());
 
         return view('livewire.uhs-forms.steps.qualifications', compact(
             'sscExams',
             'hsscExams',
             'mbbsExams',
+            'mphilExams',
             'boards',
             'institutionTypes',
         ));
