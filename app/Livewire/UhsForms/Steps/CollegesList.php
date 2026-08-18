@@ -4,6 +4,7 @@ namespace App\Livewire\UhsForms\Steps;
 
 use App\Models\College;
 use App\Models\MphillPhdSubjects;
+use App\Models\SeatCategory;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use TallStackUi\Traits\Interactions;
@@ -12,22 +13,11 @@ class CollegesList extends Component
 {
     use Interactions;
 
-    // User's selected seat category (set in mount)
-    public int $seatCategoryId = 0;
-    public string $seatCategoryName = '';
+    /** @var array<int, array{id: int, name: string, mode: string}> */
+    public array $selectedPrograms = [];
 
-    // PhD: single selection
-    public ?string $selectPhdSubject = null;
-
-    // MPhil: multiple selection (order = rank, index 0 is 1st preference)
-    public array $selectMphilSubject = [];
-
-    // Master: single selection
-    public ?string $selectMasterSubject = null;
-
-    public int $phdId    = 1;
-    public int $mphilId  = 2;
-    public int $masterId = 3;
+    /** @var array<int|string, array<int, string>> */
+    public array $preferencesByProgram = [];
 
     public function mount(): void
     {
@@ -37,111 +27,32 @@ class CollegesList extends Component
             return;
         }
 
-        // Get user's selected seat category from Step 1
-        $category = $user->seatCategories->first();
-        $this->seatCategoryId   = $category?->id ?? 0;
-        $this->seatCategoryName = $category?->name ?? '';
-
-        // Load previously saved preferences
         $subjects = $user->mphillPhdSubjects;
-        if ($subjects && $subjects->isNotEmpty()) {
-            $this->selectPhdSubject    = $subjects->where('seat_category_id', $this->phdId)->first()?->subject;
-            $this->selectMphilSubject  = $subjects->where('seat_category_id', $this->mphilId)->sortBy('id')->pluck('subject')->values()->toArray();
-            $this->selectMasterSubject = $subjects->where('seat_category_id', $this->masterId)->first()?->subject;
+
+        $this->selectedPrograms = $user->seatCategories
+            ->map(fn (SeatCategory $category) => [
+                'id'   => (int) $category->id,
+                'name' => $category->name,
+                'mode' => $category->usesRankedPreferences() ? 'ranked' : 'single',
+            ])
+            ->values()
+            ->all();
+
+        foreach ($this->selectedPrograms as $program) {
+            $saved = $subjects
+                ->where('seat_category_id', $program['id'])
+                ->sortBy('id')
+                ->pluck('subject')
+                ->filter()
+                ->values()
+                ->all();
+
+            if ($program['mode'] === 'single') {
+                $saved = array_slice($saved, 0, 1);
+            }
+
+            $this->preferencesByProgram[$program['id']] = $saved;
         }
-    }
-
-    public function togglePhd(int $collegeId): void
-    {
-        $name = $this->specialtyName($collegeId);
-        if (! $name) {
-            return;
-        }
-
-        $this->selectPhdSubject = $this->selectPhdSubject === $name ? null : $name;
-    }
-
-    public function toggleMaster(int $collegeId): void
-    {
-        $name = $this->specialtyName($collegeId);
-        if (! $name) {
-            return;
-        }
-
-        $this->selectMasterSubject = $this->selectMasterSubject === $name ? null : $name;
-    }
-
-    public function addMphil(int $collegeId): void
-    {
-        $name = $this->specialtyName($collegeId);
-        if (! $name || in_array($name, $this->selectMphilSubject, true)) {
-            return;
-        }
-
-        $this->selectMphilSubject[] = $name;
-    }
-
-    public function removeMphil(int $index): void
-    {
-        if (! isset($this->selectMphilSubject[$index])) {
-            return;
-        }
-
-        unset($this->selectMphilSubject[$index]);
-        $this->selectMphilSubject = array_values($this->selectMphilSubject);
-    }
-
-    public function clearMphil(): void
-    {
-        $this->selectMphilSubject = [];
-    }
-
-    public function moveMphilUp(int $index): void
-    {
-        if ($index < 1 || ! isset($this->selectMphilSubject[$index])) {
-            return;
-        }
-
-        $this->swapMphil($index, $index - 1);
-    }
-
-    public function moveMphilDown(int $index): void
-    {
-        if (! isset($this->selectMphilSubject[$index], $this->selectMphilSubject[$index + 1])) {
-            return;
-        }
-
-        $this->swapMphil($index, $index + 1);
-    }
-
-    public function reorderMphil(array $order): void
-    {
-        $valid = collect($order)
-            ->filter(fn ($name) => in_array($name, $this->selectMphilSubject, true))
-            ->unique()
-            ->values();
-
-        $missing = collect($this->selectMphilSubject)
-            ->reject(fn ($name) => $valid->contains($name));
-
-        $this->selectMphilSubject = $valid->concat($missing)->values()->toArray();
-    }
-
-    private function swapMphil(int $a, int $b): void
-    {
-        $items = $this->selectMphilSubject;
-        [$items[$a], $items[$b]] = [$items[$b], $items[$a]];
-        $this->selectMphilSubject = array_values($items);
-    }
-
-    private function specialtyName(int $collegeId): ?string
-    {
-        $name = College::query()
-            ->where('id', $collegeId)
-            ->where('seat_category_id', $this->seatCategoryId)
-            ->value('name');
-
-        return is_string($name) && $name !== '' ? $name : null;
     }
 
     public function back(): void
@@ -151,47 +62,51 @@ class CollegesList extends Component
 
     public function submit(): void
     {
-        // Validate based on seat category
-        $hasSelection = match ($this->seatCategoryId) {
-            $this->phdId    => ! empty($this->selectPhdSubject),
-            $this->mphilId  => ! empty($this->selectMphilSubject),
-            $this->masterId => ! empty($this->selectMasterSubject),
-            default         => false,
-        };
+        if ($this->selectedPrograms === []) {
+            $this->toast()->error('Please go back to Step 1 and select a program first.')->send();
+            $this->addError('preferences', 'Please select a program before choosing preferences.');
 
-        if (! $hasSelection) {
-            $this->toast()->error('Please select at least one specialty preference.')->send();
-            $this->addError('preferences', 'Please select at least one specialty preference.');
             return;
+        }
+
+        foreach ($this->selectedPrograms as $program) {
+            if ($this->prefsFor((int) $program['id']) === []) {
+                $this->toast()->error("Please add at least one specialty for {$program['name']}.")->send();
+                $this->addError('preferences', "Please complete preferences for {$program['name']}.");
+
+                return;
+            }
         }
 
         /** @var \App\Models\User $user */
         $user   = auth()->user();
         $userId = $user->id;
 
-        // Delete only this category's old preferences
-        MphillPhdSubjects::where('user_id', $userId)
-            ->where('seat_category_id', $this->seatCategoryId)
-            ->delete();
+        MphillPhdSubjects::where('user_id', $userId)->delete();
 
-        $now = now();
+        $now     = now();
         $inserts = [];
 
-        if ($this->seatCategoryId === $this->phdId && $this->selectPhdSubject) {
-            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectPhdSubject, 'seat_category_id' => $this->phdId, 'created_at' => $now, 'updated_at' => $now];
-        }
+        foreach ($this->selectedPrograms as $program) {
+            $programId = (int) $program['id'];
+            $items     = $this->prefsFor($programId);
 
-        if ($this->seatCategoryId === $this->mphilId) {
-            foreach ($this->selectMphilSubject as $subject) {
-                $inserts[] = ['user_id' => $userId, 'subject' => $subject, 'seat_category_id' => $this->mphilId, 'created_at' => $now, 'updated_at' => $now];
+            if ($program['mode'] === 'single') {
+                $items = array_slice($items, 0, 1);
+            }
+
+            foreach ($items as $subject) {
+                $inserts[] = [
+                    'user_id'          => $userId,
+                    'subject'          => $subject,
+                    'seat_category_id' => $programId,
+                    'created_at'       => $now,
+                    'updated_at'       => $now,
+                ];
             }
         }
 
-        if ($this->seatCategoryId === $this->masterId && $this->selectMasterSubject) {
-            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectMasterSubject, 'seat_category_id' => $this->masterId, 'created_at' => $now, 'updated_at' => $now];
-        }
-
-        if (! empty($inserts)) {
+        if ($inserts !== []) {
             MphillPhdSubjects::insert($inserts);
         }
 
@@ -199,15 +114,48 @@ class CollegesList extends Component
         $this->dispatch('goToStep', 6);
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function prefsFor(int $programId): array
+    {
+        $items = $this->preferencesByProgram[$programId]
+            ?? $this->preferencesByProgram[(string) $programId]
+            ?? [];
+
+        return array_values(array_filter(
+            $items,
+            fn ($item) => $item !== ''
+        ));
+    }
+
     public function render()
     {
-        // Load only the relevant colleges for the user's selected program
-        $colleges = Cache::remember(
-            "lookup_colleges_cat_{$this->seatCategoryId}",
-            86400,
-            fn () => College::where('seat_category_id', $this->seatCategoryId)->orderBy('name')->get()
-        );
+        $collegesByProgram = [];
 
-        return view('livewire.uhs-forms.steps.colleges-list', compact('colleges'));
+        foreach ($this->selectedPrograms as $program) {
+            $programId = (int) $program['id'];
+            $collegesByProgram[$programId] = Cache::remember(
+                "lookup_colleges_cat_{$programId}",
+                86400,
+                fn () => College::where('seat_category_id', $programId)->orderBy('name')->get(['id', 'name'])
+            )->map(fn (College $college) => [
+                'id'   => $college->id,
+                'name' => $college->name,
+            ])->values()->all();
+        }
+
+        $pickerConfig = [
+            'activeId' => $this->selectedPrograms[0]['id'] ?? 0,
+            'ranked'   => $this->preferencesByProgram,
+            'programs' => collect($this->selectedPrograms)->map(fn (array $program) => [
+                'id'       => $program['id'],
+                'name'     => $program['name'],
+                'mode'     => $program['mode'],
+                'colleges' => $collegesByProgram[$program['id']] ?? [],
+            ])->values()->all(),
+        ];
+
+        return view('livewire.uhs-forms.steps.colleges-list', compact('pickerConfig'));
     }
 }

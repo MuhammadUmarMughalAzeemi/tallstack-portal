@@ -7,6 +7,7 @@ use App\Models\PortalSetting;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -49,6 +50,18 @@ class PortalSettingResource extends Resource
                     ])
                     ->columns(1)
                     ->collapsible(),
+                Section::make('Admission Form Settings')
+                    ->description('Control whether applicants can apply to one program or several. Each selected program keeps its own specialty preference list.')
+                    ->schema([
+                        Toggle::make('allow_multiple_programs')
+                            ->label('Allow multiple program selection')
+                            ->helperText('Off: applicants pick one program (Ph.D. or M.Phil or Master). On: they can pick more than one, and Step 4 shows a separate preference list for each program.')
+                            ->onColor('success')
+                            ->offColor('gray')
+                            ->inline(false),
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
                 Section::make('🎓 Student Portal Theme Settings')
                     ->description('Configure theme preset for candidate application forms and student dashboards.')
                     ->schema([
@@ -86,6 +99,9 @@ class PortalSettingResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\IconColumn::make('allow_multiple_programs')
+                    ->label('Multi Program')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('active_theme')
                     ->label('Student Theme')
                     ->badge()

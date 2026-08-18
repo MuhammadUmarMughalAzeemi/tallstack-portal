@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $custom_css
  * @property string $admin_theme
  * @property string $admin_primary_color
+ * @property bool $allow_multiple_programs
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -22,7 +23,15 @@ class PortalSetting extends Model
         'active_theme',
         'admin_theme',
         'custom_css',
+        'allow_multiple_programs',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'allow_multiple_programs' => 'boolean',
+        ];
+    }
 
     public static function current(): self
     {
@@ -30,7 +39,13 @@ class PortalSetting extends Model
             ['id' => 1],
             [
                 'active_theme' => 'custom',
+                'allow_multiple_programs' => false,
             ]
         );
+    }
+
+    public function allowsMultiplePrograms(): bool
+    {
+        return (bool) $this->allow_multiple_programs;
     }
 }

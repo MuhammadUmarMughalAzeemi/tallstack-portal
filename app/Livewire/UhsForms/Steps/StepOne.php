@@ -29,7 +29,7 @@ class StepOne extends Component
             'personalDetails'   => $user?->personalDetails,
             'qualifications'    => $user?->qualifications,
             'admissionTest'     => $user?->admissionTest,
-            'seatCategories'    => $user?->seatCategories->pluck('name')->toArray() ?? [],
+            'seatCategories'    => $user?->seatCategories ?? collect(),
             'mphillPhdSubjects' => $user?->mphillPhdSubjects ?? collect(),
         ]);
     }

@@ -30,4 +30,11 @@ class SeatCategory extends Model
             ->withPivot('created_at', 'updated_at')
             ->using(SeatCategoryUser::class);
     }
+
+    public function usesRankedPreferences(): bool
+    {
+        $normalized = strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', $this->name));
+
+        return str_contains($normalized, 'MPHIL');
+    }
 }

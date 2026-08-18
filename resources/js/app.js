@@ -20,16 +20,46 @@ document.addEventListener('alpine:init', () => {
         cleanup(() => sortable.destroy());
     });
 
-    Alpine.data('preferencePicker', (colleges = [], ranked = []) => ({
+    Alpine.data('programPreferences', (config = {}) => ({
         search: '',
-        colleges,
-        ranked: Array.isArray(ranked) ? [...ranked] : [],
+        programs: config.programs || [],
+        activeId: config.activeId || (config.programs?.[0]?.id ?? 0),
+        ranked: config.ranked || {},
+
+        key(id) {
+            return String(id);
+        },
+
+        get active() {
+            return this.programs.find((program) => Number(program.id) === Number(this.activeId)) || this.programs[0] || null;
+        },
+
+        list(id = null) {
+            const key = this.key(id ?? this.activeId);
+            const items = this.ranked[key] ?? this.ranked[id ?? this.activeId] ?? [];
+
+            return Array.isArray(items) ? items : [];
+        },
+
+        count(id = null) {
+            return this.list(id ?? this.activeId).length;
+        },
+
+        isSelected(name) {
+            return this.list().includes(name);
+        },
 
         get available() {
+            const program = this.active;
+            if (! program) {
+                return [];
+            }
+
+            const selected = this.list(program.id);
             const query = this.search.trim().toLowerCase();
 
-            return this.colleges.filter((college) => {
-                if (this.ranked.includes(college.name)) {
+            return (program.colleges || []).filter((college) => {
+                if (program.mode === 'ranked' && selected.includes(college.name)) {
                     return false;
                 }
 
@@ -38,7 +68,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         get availableTotal() {
-            return this.colleges.filter((college) => ! this.ranked.includes(college.name)).length;
+            const program = this.active;
+            if (! program) {
+                return 0;
+            }
+
+            if (program.mode === 'single') {
+                return (program.colleges || []).length;
+            }
+
+            const selected = this.list(program.id);
+
+            return (program.colleges || []).filter((college) => ! selected.includes(college.name)).length;
         },
 
         ordinal(n) {
@@ -55,30 +96,65 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        exportRanked() {
+            const output = {};
+
+            this.programs.forEach((program) => {
+                output[program.id] = this.list(program.id);
+            });
+
+            return output;
+        },
+
         sync() {
-            const wire = this.$wire;
-            if (wire) {
-                wire.set('selectMphilSubject', [...this.ranked], false);
-            }
+            this.$wire?.set('preferencesByProgram', this.exportRanked(), false);
+        },
+
+        setList(programId, items) {
+            this.ranked = { ...this.ranked, [this.key(programId)]: items };
+            this.sync();
+        },
+
+        switchTo(id) {
+            this.activeId = Number(id);
+            this.search = '';
         },
 
         add(name) {
-            if (! name || this.ranked.includes(name)) {
+            const program = this.active;
+            if (! program || ! name) {
                 return;
             }
 
-            this.ranked.push(name);
-            this.sync();
+            let items = [...this.list(program.id)];
+
+            if (program.mode === 'single') {
+                items = items[0] === name ? [] : [name];
+            } else if (! items.includes(name)) {
+                items.push(name);
+            }
+
+            this.setList(program.id, items);
         },
 
         remove(index) {
-            this.ranked.splice(index, 1);
-            this.sync();
+            const program = this.active;
+            if (! program) {
+                return;
+            }
+
+            const items = [...this.list(program.id)];
+            items.splice(index, 1);
+            this.setList(program.id, items);
         },
 
         clear() {
-            this.ranked = [];
-            this.sync();
+            const program = this.active;
+            if (! program) {
+                return;
+            }
+
+            this.setList(program.id, []);
         },
 
         moveUp(index) {
@@ -86,26 +162,32 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            const items = this.ranked;
+            const items = [...this.list()];
             [items[index - 1], items[index]] = [items[index], items[index - 1]];
-            this.sync();
+            this.setList(this.activeId, items);
         },
 
         moveDown(index) {
-            if (index >= this.ranked.length - 1) {
+            const items = [...this.list()];
+            if (index >= items.length - 1) {
                 return;
             }
 
-            const items = this.ranked;
             [items[index], items[index + 1]] = [items[index + 1], items[index]];
-            this.sync();
+            this.setList(this.activeId, items);
         },
 
         applySort(order) {
-            const next = (order || []).filter((name) => this.ranked.includes(name));
+            const program = this.active;
+            if (! program || program.mode !== 'ranked') {
+                return;
+            }
+
+            const current = this.list(program.id);
+            const next = (order || []).filter((name) => current.includes(name));
+
             if (next.length) {
-                this.ranked = next;
-                this.sync();
+                this.setList(program.id, next);
             }
         },
     }));

@@ -91,17 +91,25 @@
                 <h3 class="font-bold text-indigo-400 text-sm">Program Seat Categories & Selected Subjects</h3>
                 <a href="{{ route('uhs-form') }}" class="text-[11px] text-indigo-400 hover:underline">Edit Preferences &rarr;</a>
             </div>
-            <div class="flex flex-wrap gap-2 pt-2">
-                @foreach($user->seatCategories as $cat)
-                    <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs rounded-lg font-medium">
-                        {{ $cat->name }}
-                    </span>
-                @endforeach
-                @foreach($user->mphillPhdSubjects as $subj)
-                    <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-lg font-medium">
-                        {{ $subj->subject }}
-                    </span>
-                @endforeach
+            <div class="space-y-3 pt-2">
+                @forelse($user->seatCategories as $cat)
+                    <div class="space-y-2">
+                        <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs rounded-lg font-medium inline-block">
+                            {{ $cat->name }}
+                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($user->mphillPhdSubjects->where('seat_category_id', $cat->id) as $index => $subj)
+                                <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-lg font-medium">
+                                    {{ $user->mphillPhdSubjects->where('seat_category_id', $cat->id)->count() > 1 ? ($index + 1) . '. ' : '' }}{{ $subj->subject }}
+                                </span>
+                            @empty
+                                <span class="text-slate-500 italic text-xs">No specialties selected</span>
+                            @endforelse
+                        </div>
+                    </div>
+                @empty
+                    <span class="text-slate-500 italic text-xs">No program selected</span>
+                @endforelse
             </div>
         </div>
     </div>

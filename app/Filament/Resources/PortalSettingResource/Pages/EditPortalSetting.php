@@ -19,6 +19,28 @@ class EditPortalSetting extends EditRecord
     protected function getFormActions(): array
     {
         return [
+            Action::make('saveAdmissionSettings')
+                ->label('Save Admission Settings')
+                ->color('info')
+                ->icon('heroicon-o-academic-cap')
+                ->action(function () {
+                    $data = $this->form->getState();
+
+                    $this->record->update([
+                        'allow_multiple_programs' => (bool) ($data['allow_multiple_programs'] ?? false),
+                    ]);
+
+                    Notification::make()
+                        ->success()
+                        ->title('Admission Settings Saved')
+                        ->body(($data['allow_multiple_programs'] ?? false)
+                            ? 'Applicants can now select multiple programs. Each program will have its own preference list.'
+                            : 'Applicants can select only one program.')
+                        ->send();
+
+                    $this->redirect($this->getResource()::getUrl('edit', ['record' => $this->record]));
+                }),
+
             Action::make('saveCustomPalette')
                 ->label('💾 Save Custom Palette')
                 ->color('warning')

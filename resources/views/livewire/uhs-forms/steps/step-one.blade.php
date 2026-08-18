@@ -48,7 +48,7 @@
         </div>
         <div class="flex flex-wrap gap-2 py-1">
             @forelse($seatCategories as $cat)
-                <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-full text-xs font-semibold">{{ $cat }}</span>
+                <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-full text-xs font-semibold">{{ is_string($cat) ? $cat : $cat->name }}</span>
             @empty
                 <span class="text-slate-500 italic">No seat category selected.</span>
             @endforelse
@@ -107,9 +107,23 @@
                 <span>Edit Preferences</span>
             </button>
         </div>
-        <div class="flex flex-wrap gap-2 py-1">
-            @forelse($mphillPhdSubjects as $sub)
-                <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-full text-xs font-semibold">{{ $sub->subject }}</span>
+        <div class="space-y-3 py-1">
+            @forelse($seatCategories as $cat)
+                @php
+                    $programSubjects = $mphillPhdSubjects->where('seat_category_id', $cat->id ?? null);
+                @endphp
+                <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-3 space-y-2">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">{{ $cat->name }}</p>
+                    <div class="flex flex-wrap gap-2">
+                        @forelse($programSubjects as $index => $sub)
+                            <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-full text-xs font-semibold">
+                                {{ $programSubjects->count() > 1 ? ($index + 1) . '. ' : '' }}{{ $sub->subject }}
+                            </span>
+                        @empty
+                            <span class="text-slate-500 italic text-xs">No specialties selected for this program.</span>
+                        @endforelse
+                    </div>
+                </div>
             @empty
                 <span class="text-slate-500 italic">No subject preferences recorded yet.</span>
             @endforelse

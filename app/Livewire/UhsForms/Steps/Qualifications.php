@@ -114,8 +114,9 @@ class Qualifications extends Component
             return;
         }
 
-        // PhD = seat category ID 1 (fixed by SeatCategorySeeder)
-        $this->isPhd = $user->seatCategories->first()?->id === 1;
+        $this->isPhd = $user->seatCategories->contains(
+            fn ($category) => (int) $category->id === 1 || str_contains(strtoupper((string) $category->name), 'PH.D')
+        );
 
         if (! $user->qualifications) {
             return;
