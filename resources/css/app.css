@@ -77,3 +77,11 @@ textarea[aria-invalid="true"]:focus {
     box-shadow: 0 8px 30px rgba(168, 85, 247, 0.3);
     border-color: rgba(168, 85, 247, 0.6) !important;
 }
+
+.drag-handle {
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}

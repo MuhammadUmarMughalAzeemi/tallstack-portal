@@ -16,13 +16,10 @@ class CollegesList extends Component
     public int $seatCategoryId = 0;
     public string $seatCategoryName = '';
 
-    // UI Style selector
-    public string $uiStyle = 'grid';
-
     // PhD: single selection
     public ?string $selectPhdSubject = null;
 
-    // MPhil: multiple selection
+    // MPhil: multiple selection (order = rank, index 0 is 1st preference)
     public array $selectMphilSubject = [];
 
     // Master: single selection
@@ -49,18 +46,102 @@ class CollegesList extends Component
         $subjects = $user->mphillPhdSubjects;
         if ($subjects && $subjects->isNotEmpty()) {
             $this->selectPhdSubject    = $subjects->where('seat_category_id', $this->phdId)->first()?->subject;
-            $this->selectMphilSubject  = $subjects->where('seat_category_id', $this->mphilId)->pluck('subject')->toArray();
+            $this->selectMphilSubject  = $subjects->where('seat_category_id', $this->mphilId)->sortBy('id')->pluck('subject')->values()->toArray();
             $this->selectMasterSubject = $subjects->where('seat_category_id', $this->masterId)->first()?->subject;
         }
     }
 
+    public function togglePhd(int $collegeId): void
+    {
+        $name = $this->specialtyName($collegeId);
+        if (! $name) {
+            return;
+        }
+
+        $this->selectPhdSubject = $this->selectPhdSubject === $name ? null : $name;
+    }
+
+    public function toggleMaster(int $collegeId): void
+    {
+        $name = $this->specialtyName($collegeId);
+        if (! $name) {
+            return;
+        }
+
+        $this->selectMasterSubject = $this->selectMasterSubject === $name ? null : $name;
+    }
+
+    public function addMphil(int $collegeId): void
+    {
+        $name = $this->specialtyName($collegeId);
+        if (! $name || in_array($name, $this->selectMphilSubject, true)) {
+            return;
+        }
+
+        $this->selectMphilSubject[] = $name;
+    }
+
+    public function removeMphil(int $index): void
+    {
+        if (! isset($this->selectMphilSubject[$index])) {
+            return;
+        }
+
+        unset($this->selectMphilSubject[$index]);
+        $this->selectMphilSubject = array_values($this->selectMphilSubject);
+    }
+
+    public function clearMphil(): void
+    {
+        $this->selectMphilSubject = [];
+    }
+
+    public function moveMphilUp(int $index): void
+    {
+        if ($index < 1 || ! isset($this->selectMphilSubject[$index])) {
+            return;
+        }
+
+        $this->swapMphil($index, $index - 1);
+    }
+
+    public function moveMphilDown(int $index): void
+    {
+        if (! isset($this->selectMphilSubject[$index], $this->selectMphilSubject[$index + 1])) {
+            return;
+        }
+
+        $this->swapMphil($index, $index + 1);
+    }
+
     public function reorderMphil(array $order): void
     {
-        // Reorder the selectMphilSubject array based on dragged order
-        $this->selectMphilSubject = collect($order)
-            ->filter(fn ($name) => in_array($name, $this->selectMphilSubject))
-            ->values()
-            ->toArray();
+        $valid = collect($order)
+            ->filter(fn ($name) => in_array($name, $this->selectMphilSubject, true))
+            ->unique()
+            ->values();
+
+        $missing = collect($this->selectMphilSubject)
+            ->reject(fn ($name) => $valid->contains($name));
+
+        $this->selectMphilSubject = $valid->concat($missing)->values()->toArray();
+    }
+
+    private function swapMphil(int $a, int $b): void
+    {
+        $items = $this->selectMphilSubject;
+        [$items[$a], $items[$b]] = [$items[$b], $items[$a]];
+        $this->selectMphilSubject = array_values($items);
+    }
+
+    private function specialtyName(int $collegeId): ?string
+    {
+        $name = College::query()
+            ->where('id', $collegeId)
+            ->where('seat_category_id', $this->seatCategoryId)
+            ->value('name');
+
+        return is_string($name) && $name !== '' ? $name : null;
     }
 
     public function back(): void
@@ -93,20 +174,21 @@ class CollegesList extends Component
             ->where('seat_category_id', $this->seatCategoryId)
             ->delete();
 
+        $now = now();
         $inserts = [];
 
         if ($this->seatCategoryId === $this->phdId && $this->selectPhdSubject) {
-            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectPhdSubject, 'seat_category_id' => $this->phdId];
+            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectPhdSubject, 'seat_category_id' => $this->phdId, 'created_at' => $now, 'updated_at' => $now];
         }
 
         if ($this->seatCategoryId === $this->mphilId) {
             foreach ($this->selectMphilSubject as $subject) {
-                $inserts[] = ['user_id' => $userId, 'subject' => $subject, 'seat_category_id' => $this->mphilId];
+                $inserts[] = ['user_id' => $userId, 'subject' => $subject, 'seat_category_id' => $this->mphilId, 'created_at' => $now, 'updated_at' => $now];
             }
         }
 
         if ($this->seatCategoryId === $this->masterId && $this->selectMasterSubject) {
-            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectMasterSubject, 'seat_category_id' => $this->masterId];
+            $inserts[] = ['user_id' => $userId, 'subject' => $this->selectMasterSubject, 'seat_category_id' => $this->masterId, 'created_at' => $now, 'updated_at' => $now];
         }
 
         if (! empty($inserts)) {
