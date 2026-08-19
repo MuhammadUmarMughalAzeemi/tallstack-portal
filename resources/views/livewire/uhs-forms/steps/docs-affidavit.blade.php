@@ -25,6 +25,12 @@
                     :file="$cnic"
                     :saved="$savedCnic"
                     label="CNIC / Passport Front"
+                    instruction="Clear color scan showing CNIC number, full name & photo"
+                    :instructions="[
+                        'Clear color scanned copy of original CNIC or Passport',
+                        'CNIC number, name, and photo must be fully visible',
+                        'File size must not exceed 2MB (JPG or PNG)',
+                    ]"
                     :error="$docErrors['cnic'] ?? null"
                     required />
             </div>
@@ -36,6 +42,12 @@
                     :file="$cnicBack"
                     :saved="$savedCnicBack"
                     label="CNIC / Passport Back"
+                    instruction="Clear scan of back side showing current address & expiry date"
+                    :instructions="[
+                        'Scanned copy of CNIC or Passport back page',
+                        'Permanent address, issue date & expiry date must be readable',
+                        'Supported formats: JPG, PNG (Max 2MB)',
+                    ]"
                     :error="$docErrors['cnicBack'] ?? null"
                     required />
             </div>
@@ -47,6 +59,12 @@
                     :file="$fatherCnic"
                     :saved="$savedFatherCnic"
                     label="Father's CNIC Front"
+                    instruction="Original scan of Father / Guardian valid CNIC front side"
+                    :instructions="[
+                        'Clear scan of Father or Guardian valid CNIC front',
+                        'Name and CNIC number must be sharp and legible',
+                        'Maximum allowed file size is 2MB',
+                    ]"
                     :error="$docErrors['fatherCnic'] ?? null"
                     required />
             </div>
@@ -58,6 +76,12 @@
                     :file="$fatherCnicBack"
                     :saved="$savedFatherCnicBack"
                     label="Father's CNIC Back"
+                    instruction="Original scan of Father / Guardian CNIC back side"
+                    :instructions="[
+                        'Clear scan of Father or Guardian CNIC back',
+                        'Barcode and official seals must be visible',
+                        'Format: JPG or PNG only',
+                    ]"
                     :error="$docErrors['fatherCnicBack'] ?? null"
                     required />
             </div>
@@ -83,6 +107,12 @@
                     :file="$photo"
                     :saved="$savedPhoto"
                     label="Passport Size Photo"
+                    instruction="Recent photograph with blue/white background & clear face"
+                    :instructions="[
+                        'Recent passport size color photograph (taken within 6 months)',
+                        'Plain white or sky blue background is mandatory',
+                        'No sunglasses, caps or obscured faces allowed',
+                    ]"
                     :error="$docErrors['photo'] ?? null"
                     required />
             </div>
@@ -94,6 +124,12 @@
                     :file="$signature"
                     :saved="$savedSignature"
                     label="Signature Image"
+                    instruction="Signature clearly done on clean white paper with dark ink"
+                    :instructions="[
+                        'Sign clearly with black or dark blue ink pen on white paper',
+                        'Crop tightly around the signature without excess shadow',
+                        'Ensure high contrast and clean background',
+                    ]"
                     :error="$docErrors['signature'] ?? null"
                     required />
             </div>
@@ -119,6 +155,12 @@
                     :file="$matricTranscript"
                     :saved="$savedMatricTranscript"
                     label="Matric / SSC Transcript"
+                    instruction="Original board marksheet / certificate showing total marks"
+                    :instructions="[
+                        'Official Matric / SSC board result card or certificate',
+                        'Total marks, obtained marks, and roll number must be clear',
+                        'Scanned copy in color (JPG / PNG up to 2MB)',
+                    ]"
                     :error="$docErrors['matricTranscript'] ?? null"
                     required />
             </div>
@@ -130,6 +172,12 @@
                     :file="$intermediateTranscript"
                     :saved="$savedIntermediateTranscript"
                     label="F.Sc / HSSC Transcript"
+                    instruction="F.Sc Pre-Medical marksheet or IBCC equivalence certificate"
+                    :instructions="[
+                        'Official intermediate / HSSC Pre-Medical result card',
+                        'IBCC equivalence certificate if applicant studied A-Levels',
+                        'Ensure all subject marks are clearly readable',
+                    ]"
                     :error="$docErrors['intermediateTranscript'] ?? null"
                     required />
             </div>
@@ -141,6 +189,12 @@
                     :file="$domicile"
                     :saved="$savedDomicile"
                     label="Domicile Certificate"
+                    instruction="Official Punjab or relevant district domicile certificate"
+                    :instructions="[
+                        'Valid domicile certificate issued by competent district authority',
+                        'Candidate name and district seal must be prominently visible',
+                        'Clear color scan (Max 2MB)',
+                    ]"
                     :error="$docErrors['domicile'] ?? null"
                     required />
             </div>
@@ -151,7 +205,13 @@
                     id="mdcatResult"
                     :file="$mdcatResult"
                     :saved="$savedMdcatResult"
-                    label="MDCAT / Entry Test Result Card" />
+                    label="MDCAT / Entry Test Result Card"
+                    instruction="Official PMC / PMDC MDCAT result printout or certificate"
+                    :instructions="[
+                        'Official MDCAT result card with roll number and score',
+                        'Optional if not applying under open merit MDCAT quota',
+                        'JPG or PNG format, max size 2MB',
+                    ]" />
             </div>
         </div>
     </div>
