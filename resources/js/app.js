@@ -5,22 +5,42 @@ import Sortable from 'sortablejs';
 // Usage: <ul x-sortable @sorted="handler($event.detail)">
 document.addEventListener('alpine:init', () => {
     Alpine.directive('sortable', (el, { expression }, { evaluate, cleanup }) => {
+        // Capture the order BEFORE SortableJS touches the DOM.
+        let orderBeforeDrag = [];
+
         const sortable = Sortable.create(el, {
             animation: 150,
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
             handle: '.drag-handle',
+            onStart() {
+                orderBeforeDrag = [...el.querySelectorAll('[data-id]')].map((n) => n.dataset.id);
+            },
             onEnd(evt) {
-                // Revert the DOM move — let Alpine's x-for own the rendering.
-                const { item, from, oldIndex, newIndex } = evt;
-                if (oldIndex !== newIndex) {
-                    from.removeChild(item);
-                    from.insertBefore(item, from.children[oldIndex] || null);
+                const { oldIndex, newIndex } = evt;
+                if (oldIndex === newIndex) {
+                    return;
                 }
 
+                // Compute the new order from the snapshot (not from current DOM).
+                const reordered = [...orderBeforeDrag];
+                const [moved] = reordered.splice(oldIndex, 1);
+                reordered.splice(newIndex, 0, moved);
+
+                // Force SortableJS to revert by re-sorting DOM to original order.
+                // We do this by putting every data-id element back in the original sequence.
+                const nodes = [...el.querySelectorAll('[data-id]')];
+                const nodeMap = {};
+                nodes.forEach((n) => { nodeMap[n.dataset.id] = n; });
+                orderBeforeDrag.forEach((id) => {
+                    if (nodeMap[id]) {
+                        el.appendChild(nodeMap[id]);
+                    }
+                });
+
                 el.dispatchEvent(new CustomEvent('sorted', {
-                    detail: { oldIndex, newIndex },
+                    detail: reordered,
                     bubbles: true,
                 }));
             },
@@ -186,16 +206,15 @@ document.addEventListener('alpine:init', () => {
             this.setList(this.activeId, items);
         },
 
-        applySort({ oldIndex, newIndex }) {
+        applySort(order) {
             const program = this.active;
-            if (! program || program.mode !== 'ranked' || oldIndex === newIndex) {
+            if (! program || program.mode !== 'ranked') {
                 return;
             }
 
-            const items = [...this.list(program.id)];
-            const [moved] = items.splice(oldIndex, 1);
-            items.splice(newIndex, 0, moved);
-            this.setList(program.id, items);
+            if (Array.isArray(order) && order.length) {
+                this.setList(program.id, order);
+            }
         },
     }));
 });
