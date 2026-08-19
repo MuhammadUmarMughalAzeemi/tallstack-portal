@@ -218,9 +218,11 @@
 
     <div class="flex justify-between pt-6 border-t border-slate-800">
         <button type="button" wire:click="back" wire:loading.attr="disabled"
-            class="h-10 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 disabled:opacity-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back
+            class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 text-xs sm:text-sm font-bold tracking-wide transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm light:bg-white light:hover:bg-slate-100 light:text-slate-800 light:border-slate-300 light:hover:border-slate-400">
+            <svg class="w-4 h-4 text-slate-400 light:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span>Back</span>
         </button>
 
         <button type="submit" wire:loading.attr="disabled" wire:target="submit"

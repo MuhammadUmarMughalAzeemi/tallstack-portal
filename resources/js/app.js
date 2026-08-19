@@ -11,9 +11,18 @@ document.addEventListener('alpine:init', () => {
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
             handle: '.drag-handle',
-            onEnd() {
-                const items = [...el.querySelectorAll('[data-id]')].map((item) => item.dataset.id);
-                el.dispatchEvent(new CustomEvent('sorted', { detail: items, bubbles: true }));
+            onEnd(evt) {
+                // Revert the DOM move — let Alpine's x-for own the rendering.
+                const { item, from, oldIndex, newIndex } = evt;
+                if (oldIndex !== newIndex) {
+                    from.removeChild(item);
+                    from.insertBefore(item, from.children[oldIndex] || null);
+                }
+
+                el.dispatchEvent(new CustomEvent('sorted', {
+                    detail: { oldIndex, newIndex },
+                    bubbles: true,
+                }));
             },
         });
 
@@ -177,18 +186,16 @@ document.addEventListener('alpine:init', () => {
             this.setList(this.activeId, items);
         },
 
-        applySort(order) {
+        applySort({ oldIndex, newIndex }) {
             const program = this.active;
-            if (! program || program.mode !== 'ranked') {
+            if (! program || program.mode !== 'ranked' || oldIndex === newIndex) {
                 return;
             }
 
-            const current = this.list(program.id);
-            const next = (order || []).filter((name) => current.includes(name));
-
-            if (next.length) {
-                this.setList(program.id, next);
-            }
+            const items = [...this.list(program.id)];
+            const [moved] = items.splice(oldIndex, 1);
+            items.splice(newIndex, 0, moved);
+            this.setList(program.id, items);
         },
     }));
 });

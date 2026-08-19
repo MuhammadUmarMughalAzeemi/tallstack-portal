@@ -222,16 +222,32 @@
     /* Primary Accent Buttons & Badges across whole portal */
     button[type="submit"],
     button.bg-primary-600,
-    .bg-indigo-600,
-    .bg-indigo-500 {
+    button.bg-indigo-600,
+    button.bg-indigo-500,
+    span.bg-indigo-600,
+    a.bg-indigo-600,
+    .bg-indigo-600.btn,
+    .btn-primary {
         background-color: {{ $palette['600'] }} !important;
+        border-color: {{ $palette['600'] }} !important;
+        color: #ffffff !important;
+    }
+    button[type="submit"] *,
+    button.bg-primary-600 *,
+    button.bg-indigo-600 *,
+    span.bg-indigo-600 * {
         color: #ffffff !important;
     }
     button[type="submit"]:hover,
     button.bg-primary-600:hover,
-    .bg-indigo-600:hover,
-    .bg-indigo-500:hover {
+    button.bg-indigo-600:hover,
+    button.bg-indigo-500:hover,
+    span.bg-indigo-600:hover,
+    a.bg-indigo-600:hover,
+    .btn-primary:hover {
         background-color: {{ $palette['700'] }} !important;
+        border-color: {{ $palette['700'] }} !important;
+        color: #ffffff !important;
     }
     .text-indigo-400, .text-indigo-500, .text-indigo-600 {
         color: {{ $palette['600'] }} !important;
@@ -245,6 +261,71 @@
         height: 1.15rem !important;
         cursor: pointer !important;
         vertical-align: middle !important;
+    }
+
+    /* ============================================================ */
+    /* 🎯 UNIVERSAL INTERACTIVE CURSORS & HOVER ENGINE              */
+    /* ============================================================ */
+    /* 1. All Clickable Elements -> Instant Hand Pointer (👆) */
+    button:not(:disabled),
+    a[href],
+    label:not([disabled]),
+    select:not(:disabled),
+    summary,
+    [wire\:click]:not(:disabled):not([disabled]),
+    [role="button"]:not(:disabled):not([disabled]),
+    [onclick]:not(:disabled):not([disabled]),
+    [tabindex="0"],
+    .cursor-pointer,
+    input[type="submit"]:not(:disabled),
+    input[type="button"]:not(:disabled),
+    input[type="reset"]:not(:disabled),
+    input[type="checkbox"]:not(:disabled),
+    input[type="radio"]:not(:disabled),
+    input[type="file"]:not(:disabled),
+    [data-upload-field],
+    [data-option-card],
+    [x-on\:click] {
+        cursor: pointer !important;
+    }
+
+    /* 2. Drag & Reorder Handles -> Grab Hand (✋) */
+    .drag-handle,
+    [data-sortable-handle],
+    [x-sortable] [data-id] {
+        cursor: grab !important;
+    }
+    .drag-handle:active,
+    [data-sortable-handle]:active,
+    [x-sortable] [data-id]:active {
+        cursor: grabbing !important;
+    }
+
+    /* 3. Text Inputs & Editable Areas -> I-Beam Text Cursor (I) */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="file"]):not([type="color"]):not(:disabled),
+    textarea:not(:disabled) {
+        cursor: text !important;
+    }
+
+    /* 4. Disabled & Blocked Elements -> Prohibited Sign (🚫) */
+    button:disabled,
+    button[disabled],
+    [disabled],
+    .disabled,
+    input:disabled,
+    select:disabled,
+    textarea:disabled,
+    [aria-disabled="true"],
+    .cursor-not-allowed {
+        cursor: not-allowed !important;
+        pointer-events: auto !important;
+    }
+
+    /* 5. Interactive subtle scale/feel for primary buttons */
+    button:not(:disabled):active,
+    a[href]:active {
+        transform: scale(0.985);
+        transition: transform 0.1s ease;
     }
 
     /* ============================================================ */
@@ -273,20 +354,53 @@
     /* Sidebar & Unselected Option Cards (e.g. M.Phil, Master, Categories) */
     [data-user-mode="light"] .bg-slate-900\/60,
     [data-user-mode="light"] .bg-slate-800,
-    [data-user-mode="light"] [class*="bg-slate-800"],
+    [data-user-mode="light"] [class*="bg-slate-800"]:not(button):not(span.bg-indigo-600),
     [data-user-mode="light"] aside {
         background-color: #f8fafc !important;
         border-color: #cbd5e1 !important;
         color: #1e293b !important;
     }
 
-    /* Selected Option Cards (e.g. PhD, active step) */
-    [data-user-mode="light"] [class*="bg-indigo-500"],
-    [data-user-mode="light"] [class*="bg-indigo-600"] {
+    /* Selected Option Cards (e.g. PhD, active step card) — ONLY cards, NOT buttons */
+    [data-user-mode="light"] div[class*="bg-indigo-500"]:not(button):not(span),
+    [data-user-mode="light"] div[class*="bg-indigo-600"]:not(button):not(span),
+    [data-user-mode="light"] label[class*="bg-indigo-500"]:not(button),
+    [data-user-mode="light"] label[class*="bg-indigo-600"]:not(button) {
         background-color: {{ $palette['100'] }} !important;
         border-color: {{ $palette['500'] }} !important;
         color: {{ $palette['800'] }} !important;
         font-weight: 700 !important;
+    }
+
+    /* Light Mode Primary Action Buttons — ALWAYS 100% Solid Primary Background & White Text */
+    [data-user-mode="light"] button[type="submit"],
+    [data-user-mode="light"] button.bg-indigo-600,
+    [data-user-mode="light"] button.bg-indigo-500,
+    [data-user-mode="light"] button.bg-primary-600,
+    [data-user-mode="light"] span.bg-indigo-600,
+    [data-user-mode="light"] a.bg-indigo-600,
+    [data-user-mode="light"] .btn-primary {
+        background-color: {{ $palette['600'] }} !important;
+        border-color: {{ $palette['600'] }} !important;
+        color: #ffffff !important;
+    }
+    [data-user-mode="light"] button[type="submit"] *,
+    [data-user-mode="light"] button.bg-indigo-600 *,
+    [data-user-mode="light"] button.bg-indigo-500 *,
+    [data-user-mode="light"] button.bg-primary-600 *,
+    [data-user-mode="light"] span.bg-indigo-600 * {
+        color: #ffffff !important;
+    }
+    [data-user-mode="light"] button[type="submit"]:hover,
+    [data-user-mode="light"] button.bg-indigo-600:hover,
+    [data-user-mode="light"] button.bg-indigo-500:hover,
+    [data-user-mode="light"] button.bg-primary-600:hover,
+    [data-user-mode="light"] span.bg-indigo-600:hover,
+    [data-user-mode="light"] a.bg-indigo-600:hover,
+    [data-user-mode="light"] .btn-primary:hover {
+        background-color: {{ $palette['700'] }} !important;
+        border-color: {{ $palette['700'] }} !important;
+        color: #ffffff !important;
     }
 
     /* Inputs, Selects, and Textareas */
@@ -330,25 +444,52 @@
     [data-user-mode="light"] h5,
     [data-user-mode="light"] h6,
     [data-user-mode="light"] label,
-    [data-user-mode="light"] span:not(.text-white),
-    [data-user-mode="light"] p,
-    [data-user-mode="light"] [class*="text-slate-100"],
-    [data-user-mode="light"] [class*="text-slate-200"],
-    [data-user-mode="light"] [class*="text-slate-300"] {
+    [data-user-mode="light"] span:not(.text-white):not(.bg-indigo-600):not(.bg-emerald-600):not(button *):not(a.bg-indigo-600 *),
+    [data-user-mode="light"] p:not(button *):not(a.bg-indigo-600 *),
+    [data-user-mode="light"] [class*="text-slate-100"]:not(button *):not(a.bg-indigo-600 *),
+    [data-user-mode="light"] [class*="text-slate-200"]:not(button *):not(a.bg-indigo-600 *),
+    [data-user-mode="light"] [class*="text-slate-300"]:not(button *):not(a.bg-indigo-600 *) {
         color: #0f172a !important;
     }
-    [data-user-mode="light"] [class*="text-slate-400"],
-    [data-user-mode="light"] [class*="text-slate-500"] {
+    [data-user-mode="light"] [class*="text-slate-400"]:not(button *):not(a.bg-indigo-600 *),
+    [data-user-mode="light"] [class*="text-slate-500"]:not(button *):not(a.bg-indigo-600 *) {
         color: #475569 !important;
     }
 
-    /* Primary action buttons — keep white label/icon text in light mode */
-    [data-user-mode="light"] button.text-white,
-    [data-user-mode="light"] button.text-white span,
-    [data-user-mode="light"] button.text-white svg,
+    /* Primary action buttons — STRICT white text/icons guarantee across ALL themes */
+    button[type="submit"],
+    button[type="submit"] *,
+    button.bg-primary-600,
+    button.bg-primary-600 *,
+    button.bg-indigo-600,
+    button.bg-indigo-600 *,
+    button.bg-indigo-500,
+    button.bg-indigo-500 *,
+    a.bg-indigo-600,
+    a.bg-indigo-600 *,
+    span.bg-indigo-600,
+    span.bg-indigo-600 *,
+    .btn-primary,
+    .btn-primary * {
+        color: #ffffff !important;
+    }
+
+    [data-user-mode="light"] button[type="submit"],
+    [data-user-mode="light"] button[type="submit"] *,
     [data-user-mode="light"] button.bg-primary-600,
-    [data-user-mode="light"] button.bg-primary-600 span,
-    [data-user-mode="light"] button.bg-primary-600 svg {
+    [data-user-mode="light"] button.bg-primary-600 *,
+    [data-user-mode="light"] button.bg-indigo-600,
+    [data-user-mode="light"] button.bg-indigo-600 *,
+    [data-user-mode="light"] button.bg-indigo-500,
+    [data-user-mode="light"] button.bg-indigo-500 *,
+    [data-user-mode="light"] a.bg-indigo-600,
+    [data-user-mode="light"] a.bg-indigo-600 *,
+    [data-user-mode="light"] span.bg-indigo-600,
+    [data-user-mode="light"] span.bg-indigo-600 *,
+    [data-user-mode="light"] button.text-white,
+    [data-user-mode="light"] button.text-white *,
+    [data-user-mode="light"] .btn-primary,
+    [data-user-mode="light"] .btn-primary * {
         color: #ffffff !important;
     }
 

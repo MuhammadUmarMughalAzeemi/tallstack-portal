@@ -8,9 +8,9 @@
 
     <!-- Identity Documents -->
     <div class="space-y-4">
-        <div class="flex items-center gap-2 pb-1 border-b border-slate-800/60 light:border-slate-200">
-            <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
-                <svg class="w-3.5 h-3.5 text-indigo-400 light:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2 pb-1 border-b border-slate-800 light:border-slate-200">
+            <div class="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-800 flex items-center justify-center flex-shrink-0 light:bg-indigo-100 light:border-indigo-200">
+                <svg class="w-3.5 h-3.5 text-indigo-400 light:text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/>
                 </svg>
             </div>
@@ -90,9 +90,9 @@
 
     <!-- Personal Photos -->
     <div class="space-y-4">
-        <div class="flex items-center gap-2 pb-1 border-b border-slate-800/60 light:border-slate-200">
-            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                <svg class="w-3.5 h-3.5 text-emerald-400 light:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2 pb-1 border-b border-slate-800 light:border-slate-200">
+            <div class="w-7 h-7 rounded-lg bg-emerald-950 border border-emerald-800 flex items-center justify-center flex-shrink-0 light:bg-emerald-100 light:border-emerald-200">
+                <svg class="w-3.5 h-3.5 text-emerald-400 light:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
             </div>
@@ -138,9 +138,9 @@
 
     <!-- Academic Certificates -->
     <div class="space-y-4">
-        <div class="flex items-center gap-2 pb-1 border-b border-slate-800/60 light:border-slate-200">
-            <div class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <svg class="w-3.5 h-3.5 text-amber-400 light:text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2 pb-1 border-b border-slate-800 light:border-slate-200">
+            <div class="w-7 h-7 rounded-lg bg-amber-950 border border-amber-800 flex items-center justify-center flex-shrink-0 light:bg-amber-100 light:border-amber-200">
+                <svg class="w-3.5 h-3.5 text-amber-400 light:text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
             </div>
@@ -218,31 +218,34 @@
 
     <!-- Other Documents -->
     <div class="space-y-3">
-        <div class="flex items-center justify-between pb-1 border-b border-slate-800/60 light:border-slate-200">
+        <div class="flex items-center justify-between pb-1 border-b border-slate-800 light:border-slate-200">
             <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-3.5 h-3.5 text-purple-400 light:text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-800 flex items-center justify-center flex-shrink-0 light:bg-indigo-100 light:border-indigo-200">
+                    <svg class="w-3.5 h-3.5 text-indigo-400 light:text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
                 <div>
                     <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest light:text-slate-700">Other Documents</h3>
-                    <p class="text-[10px] text-slate-500 mt-0.5 light:text-slate-500">{{ $otherDocumentsEnabled ? 'Required — add at least one document' : 'Optional — add any additional supporting documents' }}</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5 light:text-slate-600">{{ $otherDocumentsEnabled ? 'Required — add at least one document' : 'Optional — add any additional supporting documents' }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border border-purple-500/30 hover:bg-purple-500/5 transition-all light:border-purple-300 light:hover:bg-purple-50"
+                <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border transition-all shadow-sm {{ $otherDocumentsEnabled ? 'bg-indigo-950/40 border-indigo-500/50 light:bg-indigo-50 light:border-indigo-300' : 'bg-slate-800 border-slate-700 light:bg-white light:border-slate-300' }}"
                        title="{{ $otherDocumentsEnabled ? 'Disable Other Documents (optional)' : 'Enable Other Documents (at least one required)' }}">
                     <input type="checkbox" wire:model.live="otherDocumentsEnabled"
-                           class="w-4 h-4 rounded border-purple-400 text-purple-600 focus:ring-purple-500 bg-slate-950 cursor-pointer light:bg-white light:border-slate-300">
-                    <span class="text-xs font-semibold {{ $otherDocumentsEnabled ? 'text-purple-400 light:text-purple-600' : 'text-slate-500 light:text-slate-600' }}">
+                           class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-950 cursor-pointer light:bg-white light:border-slate-300">
+                    <span class="text-xs font-bold {{ $otherDocumentsEnabled ? 'text-indigo-400 light:text-indigo-700' : 'text-slate-400 light:text-slate-600' }}">
                         {{ $otherDocumentsEnabled ? 'Enabled' : 'Enable' }}
                     </span>
                 </label>
 
                 <button type="button" wire:click="addOtherDocument" {{ !$otherDocumentsEnabled ? 'disabled' : '' }}
-                    class="flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-3 py-1.5 rounded-lg transition-all light:text-purple-600 light:hover:text-purple-700 light:bg-purple-50 light:hover:bg-purple-100 light:border-purple-200
-                        {{ !$otherDocumentsEnabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                    @class([
+                        'flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all',
+                        'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30' => $otherDocumentsEnabled,
+                        'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed shadow-none light:bg-slate-100 light:text-slate-400 light:border-slate-300' => ! $otherDocumentsEnabled,
+                    ])>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -253,42 +256,42 @@
 
         {{-- Validation error --}}
         @error('otherDocuments')
-            <div class="flex items-start gap-2 px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg">
-                <svg class="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-start gap-2 px-3 py-2 bg-rose-950/40 border border-rose-700 rounded-lg light:bg-rose-50 light:border-rose-300">
+                <svg class="w-4 h-4 text-rose-400 light:text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                 </svg>
-                <span class="text-[11px] text-rose-400">{{ $message }}</span>
+                <span class="text-[11px] text-rose-400 light:text-rose-700 font-semibold">{{ $message }}</span>
             </div>
         @enderror
 
         {{-- Table --}}
-        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden light:bg-white light:border-slate-200
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden light:bg-white light:border-slate-300
             {{ !$otherDocumentsEnabled ? 'opacity-60 pointer-events-none' : '' }}">
 
             {{-- Column headers --}}
-            <div class="grid grid-cols-12 gap-3 px-4 py-2.5 bg-slate-950/60 border-b border-slate-800 light:bg-slate-50 light:border-slate-200">
-                <div class="col-span-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest light:text-slate-500">#</div>
-                <div class="col-span-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest light:text-slate-500">
+            <div class="grid grid-cols-12 gap-3 px-4 py-2.5 bg-slate-950 border-b border-slate-700 light:bg-slate-100 light:border-slate-200">
+                <div class="col-span-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest light:text-slate-600">#</div>
+                <div class="col-span-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest light:text-slate-600">
                     Document Name
                     @if($otherDocumentsEnabled)
                         <span class="text-rose-500 ml-1">*</span>
                     @endif
                 </div>
-                <div class="col-span-5 text-[10px] font-bold text-slate-500 uppercase tracking-widest light:text-slate-500">
+                <div class="col-span-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest light:text-slate-600">
                     File
                     @if($otherDocumentsEnabled)
                         <span class="text-rose-500 ml-1">*</span>
                     @endif
                 </div>
-                <div class="col-span-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right light:text-slate-500">Actions</div>
+                <div class="col-span-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right light:text-slate-600">Actions</div>
             </div>
 
             {{-- Rows --}}
             @foreach($otherDocuments as $index => $doc)
                 <div class="grid grid-cols-12 gap-3 px-4 py-3 items-center
-                    {{ ! $loop->last ? 'border-b border-slate-800/50 light:border-slate-200' : '' }}
-                    {{ $doc['savedUrl'] ? 'bg-emerald-500/5 light:bg-emerald-50/50' : '' }}
-                    {{ $otherDocumentsEnabled && $index === 0 ? 'bg-purple-500/5 light:bg-purple-50/50' : '' }}">
+                    {{ ! $loop->last ? 'border-b border-slate-800 light:border-slate-200' : '' }}
+                    {{ $doc['savedUrl'] ? 'bg-emerald-950/20 light:bg-emerald-50' : '' }}
+                    {{ $otherDocumentsEnabled && $index === 0 ? 'bg-indigo-950/20 light:bg-indigo-50/50' : '' }}">
 
                     {{-- # --}}
                     <div class="col-span-1">
@@ -310,7 +313,7 @@
                                 wire:model="otherDocuments.{{ $index }}.docName"
                                 placeholder="e.g. NOC, Experience Certificate..."
                                 class="w-full bg-slate-950 border rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-colors light:bg-white light:text-slate-900 light:placeholder-slate-400 light:border-slate-300
-                                    {{ $errors->has('otherDocuments.'.$index.'.docName') ? '!border-rose-500 focus:!border-rose-500 focus:ring-rose-500/20' : 'border-slate-700 focus:border-purple-500' }}
+                                    {{ $errors->has('otherDocuments.'.$index.'.docName') ? '!border-rose-500 focus:!border-rose-500 focus:ring-rose-500/20' : 'border-slate-700 focus:border-indigo-500' }}
                                     {{ $otherDocumentsEnabled && $index === 0 && empty(trim($doc['docName'] ?? '')) ? 'ring-1 ring-rose-500/30' : '' }}">
                             @error('otherDocuments.'.$index.'.docName')
                                 <span class="text-[10px] text-rose-400 mt-1 block font-medium flex items-center gap-1">
@@ -555,32 +558,32 @@
     <!-- Navigation -->
     <div class="pt-6 flex justify-between gap-4 border-t border-slate-800 light:border-slate-200">
         <button type="button" wire:click="back" wire:loading.attr="disabled"
-            class="h-10 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 disabled:opacity-50 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 text-xs sm:text-sm font-bold tracking-wide transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm light:bg-white light:hover:bg-slate-100 light:text-slate-800 light:border-slate-300 light:hover:border-slate-400">
+            <svg class="w-4 h-4 text-slate-400 light:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Back
+            <span>Back</span>
         </button>
 
         <button type="submit" wire:loading.attr="disabled" wire:target="submit"
             @if($hasPendingUploads) disabled @endif
             @class([
                 'px-8 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed',
-                'bg-primary-600 hover:bg-primary-700 shadow-primary-600/30' => ! $hasPendingUploads,
+                'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/30' => ! $hasPendingUploads,
                 'bg-slate-700 cursor-not-allowed shadow-none light:bg-slate-300 light:text-slate-500' => $hasPendingUploads,
             ])>
-            <svg wire:loading wire:target="submit" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <svg wire:loading wire:target="submit" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
             </svg>
-            <svg wire:loading.remove wire:target="submit" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <svg wire:loading.remove wire:target="submit" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
             </svg>
             @if($hasPendingUploads)
-                <span>Save all documents before proceeding...</span>
+                <span class="text-white font-bold">Save all documents before proceeding...</span>
             @else
-                <span wire:loading.remove wire:target="submit">Save & Proceed to Review</span>
-                <span wire:loading wire:target="submit">Saving...</span>
+                <span wire:loading.remove wire:target="submit" class="text-white font-bold">Save & Proceed to Review</span>
+                <span wire:loading wire:target="submit" class="text-white font-bold">Saving...</span>
             @endif
         </button>
     </div>
