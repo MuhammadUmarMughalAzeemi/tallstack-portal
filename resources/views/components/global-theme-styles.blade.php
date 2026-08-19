@@ -351,14 +351,39 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
     }
 
-    /* Sidebar & Unselected Option Cards (e.g. M.Phil, Master, Categories) */
+    /* Sidebar & Container (Light Mode) */
     [data-user-mode="light"] .bg-slate-900\/60,
-    [data-user-mode="light"] .bg-slate-800,
+    [data-user-mode="light"] .bg-slate-800:not(button):not(span.bg-indigo-600),
     [data-user-mode="light"] [class*="bg-slate-800"]:not(button):not(span.bg-indigo-600),
     [data-user-mode="light"] aside {
         background-color: #f8fafc !important;
-        border-color: #cbd5e1 !important;
+        border-color: #e2e8f0 !important;
         color: #1e293b !important;
+    }
+
+    /* 3D Floating Glassmorphic Navigation Cards (Light Mode) */
+    [data-user-mode="light"] aside nav button:not([class*="translate-x-1"]) {
+        background-color: #ffffff;
+        border-color: #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+    [data-user-mode="light"] aside nav button:not([class*="translate-x-1"]):hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+    }
+    [data-user-mode="light"] aside nav button p.text-xs {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    [data-user-mode="light"] aside nav button[class*="translate-x-1"] {
+        background: linear-gradient(135deg, {{ $palette['50'] }} 0%, #ffffff 55%, #fdf4ff 100%) !important;
+        border-color: {{ $palette['300'] }} !important;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.1) !important;
+    }
+    [data-user-mode="light"] aside nav button[class*="translate-x-1"] p.text-xs {
+        color: {{ $palette['950'] }} !important;
+        font-weight: 900 !important;
     }
 
     /* Selected Option Cards (e.g. PhD, active step card) — ONLY cards, NOT buttons */
