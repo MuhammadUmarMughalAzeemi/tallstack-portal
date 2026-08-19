@@ -138,6 +138,21 @@ class Qualification extends Model
         return $this->hasOne(Boards::class, 'id', 'hssc_board_id');
     }
 
+    public function mbbsBoard(): HasOne
+    {
+        return $this->hasOne(Boards::class, 'id', 'mbbs_board_id');
+    }
+
+    public function mphilBoard(): HasOne
+    {
+        return $this->hasOne(Boards::class, 'id', 'mphil_board_id');
+    }
+
+    public function mphilExam(): HasOne
+    {
+        return $this->hasOne(MphilExam::class, 'id', 'mphil_exam_passeds_id');
+    }
+
     public function institutiontype(): HasOne
     {
         return $this->hasOne(InstitutionType::class);

@@ -220,11 +220,17 @@
     }
 
     /* Primary Accent Buttons & Badges across whole portal */
-    button[type="submit"], .bg-indigo-600, .bg-indigo-500 {
+    button[type="submit"],
+    button.bg-primary-600,
+    .bg-indigo-600,
+    .bg-indigo-500 {
         background-color: {{ $palette['600'] }} !important;
         color: #ffffff !important;
     }
-    button[type="submit"]:hover, .bg-indigo-600:hover, .bg-indigo-500:hover {
+    button[type="submit"]:hover,
+    button.bg-primary-600:hover,
+    .bg-indigo-600:hover,
+    .bg-indigo-500:hover {
         background-color: {{ $palette['700'] }} !important;
     }
     .text-indigo-400, .text-indigo-500, .text-indigo-600 {
@@ -336,6 +342,16 @@
         color: #475569 !important;
     }
 
+    /* Primary action buttons — keep white label/icon text in light mode */
+    [data-user-mode="light"] button.text-white,
+    [data-user-mode="light"] button.text-white span,
+    [data-user-mode="light"] button.text-white svg,
+    [data-user-mode="light"] button.bg-primary-600,
+    [data-user-mode="light"] button.bg-primary-600 span,
+    [data-user-mode="light"] button.bg-primary-600 svg {
+        color: #ffffff !important;
+    }
+
     /* ============================================================ */
     /* 🌙 DARK MODE RULES (Applies when data-user-mode="dark" OR default dark theme) */
     /* ============================================================ */
@@ -398,6 +414,20 @@
     input[type="radio"]:checked {
         background-color: {{ $palette['600'] }} !important;
         border-color: {{ $palette['600'] }} !important;
+    }
+
+    /* Document upload — primary buttons & progress (theme-aware) */
+    .bg-primary-600 {
+        background-color: {{ $palette['600'] }} !important;
+        color: #ffffff !important;
+    }
+    .bg-primary-600:hover,
+    .hover\:bg-primary-700:hover {
+        background-color: {{ $palette['700'] }} !important;
+    }
+    .bg-primary-600 .h-full,
+    .bg-primary-600.transition-all {
+        background-color: {{ $palette['600'] }} !important;
     }
 
     /* Custom CSS Overrides defined in PortalSetting */

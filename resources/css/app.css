@@ -6,6 +6,8 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where([data-user-mode="light"] *));
+@custom-variant user-dark (&:where([data-user-mode="dark"] *));
 
 @plugin '@tailwindcss/forms';
 

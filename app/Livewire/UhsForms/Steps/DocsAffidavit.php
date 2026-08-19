@@ -45,6 +45,15 @@ class DocsAffidavit extends Component
     public $intermediateTranscript;
     public $mdcatResult;
 
+    /**
+     * Inline error messages for required standard documents.
+     * We keep these separate from Livewire's `$errors` bag so we can
+     * remove ONLY the relevant field's error as soon as the user selects a new file.
+     *
+     * @var array<string, string>
+     */
+    public array $docErrors = [];
+
     // ─── Saved public URLs (populated in mount from Spatie) ─────────────────
     public ?string $savedCnic                    = null;
     public ?string $savedCnicBack                = null;
@@ -99,6 +108,18 @@ class DocsAffidavit extends Component
     ];
 
     // ─── Validation ─────────────────────────────────────────────────────────
+    private const REQUIRED_DOCUMENTS = [
+        'cnic'                   => ['saved' => 'savedCnic', 'label' => 'CNIC / Passport — Front'],
+        'cnicBack'               => ['saved' => 'savedCnicBack', 'label' => 'CNIC / Passport — Back'],
+        'fatherCnic'             => ['saved' => 'savedFatherCnic', 'label' => "Father's CNIC — Front"],
+        'fatherCnicBack'         => ['saved' => 'savedFatherCnicBack', 'label' => "Father's CNIC — Back"],
+        'photo'                  => ['saved' => 'savedPhoto', 'label' => 'Passport Size Photo'],
+        'signature'              => ['saved' => 'savedSignature', 'label' => 'Digital Signature'],
+        'matricTranscript'       => ['saved' => 'savedMatricTranscript', 'label' => 'Matric / SSC Transcript'],
+        'intermediateTranscript' => ['saved' => 'savedIntermediateTranscript', 'label' => 'F.Sc / HSSC Transcript'],
+        'domicile'               => ['saved' => 'savedDomicile', 'label' => 'Domicile Certificate'],
+    ];
+
     protected function rules(): array
     {
         $rules = [
@@ -238,7 +259,101 @@ class DocsAffidavit extends Component
         $this->$savedProp = $media->getUrl();
         $this->$field     = null;
 
+        // Clear inline required error after successful save
+        unset($this->docErrors[$field]);
+
         $this->toast()->success('Saved', 'Document saved successfully.')->send();
+    }
+
+    public function hasPendingUploads(): bool
+    {
+        foreach (array_keys(self::FIELD_COLLECTION_MAP) as $field) {
+            if ($this->$field && ! is_string($this->$field)) {
+                return true;
+            }
+        }
+
+        foreach ($this->otherDocuments as $doc) {
+            if (! empty($doc['file']) && ! is_string($doc['file'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * When a user selects a file, remove the inline error for only that field.
+     * Livewire calls these automatically on temp upload assignment.
+     */
+    public function updatedCnic(): void
+    {
+        unset($this->docErrors['cnic']);
+    }
+
+    public function updatedCnicBack(): void
+    {
+        unset($this->docErrors['cnicBack']);
+    }
+
+    public function updatedFatherCnic(): void
+    {
+        unset($this->docErrors['fatherCnic']);
+    }
+
+    public function updatedFatherCnicBack(): void
+    {
+        unset($this->docErrors['fatherCnicBack']);
+    }
+
+    public function updatedPhoto(): void
+    {
+        unset($this->docErrors['photo']);
+    }
+
+    public function updatedSignature(): void
+    {
+        unset($this->docErrors['signature']);
+    }
+
+    public function updatedMatricTranscript(): void
+    {
+        unset($this->docErrors['matricTranscript']);
+    }
+
+    public function updatedIntermediateTranscript(): void
+    {
+        unset($this->docErrors['intermediateTranscript']);
+    }
+
+    public function updatedDomicile(): void
+    {
+        unset($this->docErrors['domicile']);
+    }
+
+    public function updatedMdcatResult(): void
+    {
+        // mdcatResult is not required; kept here just in case UI uses same component.
+        unset($this->docErrors['mdcatResult']);
+    }
+
+    private function validateRequiredDocuments(): void
+    {
+        $errors = [];
+
+        foreach (self::REQUIRED_DOCUMENTS as $field => $config) {
+            $savedProp = $config['saved'];
+
+            if (empty($this->$savedProp)) {
+                $message = "Please upload {$config['label']}.";
+                $errors[$field] = [$message];
+                $this->docErrors[$field] = $message;
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     // ─── Other documents actions ─────────────────────────────────────────────
@@ -320,6 +435,7 @@ class DocsAffidavit extends Component
     public function submit(): void
     {
         try {
+            $this->validateRequiredDocuments();
             $this->validate();
         } catch (ValidationException $e) {
             // Build detailed error message from all validation errors
@@ -340,23 +456,6 @@ class DocsAffidavit extends Component
         /** @var User $user */
         $user = auth()->user();
 
-        // Auto-save any remaining standard temp files
-        foreach (array_keys(self::FIELD_COLLECTION_MAP) as $field) {
-            if ($this->$field && ! is_string($this->$field)) {
-                $this->saveSingleDocument($field);
-            }
-        }
-
-        // Auto-save any remaining other-document temp files
-        // Only rows with BOTH name + file are saved; empty rows are ignored
-        foreach (array_keys($this->otherDocuments) as $index) {
-            $row = $this->otherDocuments[$index];
-
-            if (!empty($row['file']) && !is_string($row['file']) && !empty(trim($row['docName'] ?? ''))) {
-                $this->saveOtherDocument($index);
-            }
-        }
-
         $user->update(['accepted_terms_and_conditions' => true]);
 
         $this->dispatch('completeStep', 'step6Completed');
@@ -367,7 +466,9 @@ class DocsAffidavit extends Component
 
     public function render()
     {
-        return view('livewire.uhs-forms.steps.docs-affidavit');
+        return view('livewire.uhs-forms.steps.docs-affidavit', [
+            'hasPendingUploads' => $this->hasPendingUploads(),
+        ]);
     }
 
     // ─── Private helpers ────────────────────────────────────────────────────
