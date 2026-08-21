@@ -50,7 +50,7 @@ class Address extends Component
         UserAddress::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 2, data: $data);
-        $this->toast()->success('Step 2: Address details saved.')->send();
+        $this->toast()->timeout(3)->success('Step 2: Address details saved.')->send();
     }
 
     public function render()

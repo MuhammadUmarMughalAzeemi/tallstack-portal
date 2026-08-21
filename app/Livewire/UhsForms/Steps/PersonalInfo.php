@@ -51,7 +51,7 @@ class PersonalInfo extends Component
         UserPersonalInfo::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 1, data: $data);
-        $this->toast()->success('Step 1: Personal Info saved.')->send();
+        $this->toast()->timeout(3)->success('Step 1: Personal Info saved.')->send();
     }
 
     public function render()

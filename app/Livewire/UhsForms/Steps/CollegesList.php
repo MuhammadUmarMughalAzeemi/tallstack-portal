@@ -63,7 +63,7 @@ class CollegesList extends Component
     public function submit(): void
     {
         if ($this->selectedPrograms === []) {
-            $this->toast()->error('Please go back to Step 1 and select a program first.')->send();
+            $this->toast()->timeout(3)->error('Please go back to Step 1 and select a program first.')->send();
             $this->addError('preferences', 'Please select a program before choosing preferences.');
 
             return;
@@ -71,7 +71,7 @@ class CollegesList extends Component
 
         foreach ($this->selectedPrograms as $program) {
             if ($this->prefsFor((int) $program['id']) === []) {
-                $this->toast()->error("Please add at least one specialty for {$program['name']}.")->send();
+                $this->toast()->timeout(3)->error("Please add at least one specialty for {$program['name']}.")->send();
                 $this->addError('preferences', "Please complete preferences for {$program['name']}.");
 
                 return;

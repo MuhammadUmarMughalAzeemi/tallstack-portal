@@ -361,40 +361,119 @@
         color: #1e293b !important;
     }
 
-    /* 3D Floating Glassmorphic Navigation Cards (Light Mode) */
-    [data-user-mode="light"] aside nav button:not([class*="translate-x-1"]) {
-        background-color: #ffffff;
-        border-color: #e2e8f0;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    /* ============================================================ */
+    /* 🌟 ACTIVE / SELECTED STEP CARD DYNAMIC THEME ENGINE           */
+    /* ============================================================ */
+    /* 1. Active Step Card Container (Dark Mode) */
+    aside nav button.step-card-active,
+    aside nav button[data-active-step="true"],
+    [data-user-mode="dark"] aside nav button.step-card-active,
+    [data-user-mode="dark"] aside nav button[data-active-step="true"] {
+        background: linear-gradient(135deg, {{ $palette['900'] }}95 0%, #0f172a 60%, {{ $palette['950'] }} 100%) !important;
+        border: 1.5px solid {{ $palette['500'] }}80 !important;
+        box-shadow: 0 10px 25px -5px {{ $palette['600'] }}35 !important;
     }
-    [data-user-mode="light"] aside nav button:not([class*="translate-x-1"]):hover {
-        background-color: #f8fafc;
-        border-color: #cbd5e1;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
-    }
-    [data-user-mode="light"] aside nav button p.text-xs {
-        color: #0f172a !important;
-        font-weight: 700 !important;
-    }
+
+    /* Active Step Card Container (Light Mode) */
+    [data-user-mode="light"] aside nav button.step-card-active,
+    [data-user-mode="light"] aside nav button[data-active-step="true"],
     [data-user-mode="light"] aside nav button[class*="translate-x-1"] {
-        background: linear-gradient(135deg, {{ $palette['50'] }} 0%, #ffffff 55%, #fdf4ff 100%) !important;
-        border-color: {{ $palette['300'] }} !important;
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.1) !important;
+        background: linear-gradient(135deg, {{ $palette['50'] }} 0%, #ffffff 55%, {{ $palette['100'] }}50 100%) !important;
+        border: 1.5px solid {{ $palette['400'] }} !important;
+        box-shadow: 0 10px 20px -3px {{ $palette['500'] }}20, 0 4px 6px -4px {{ $palette['500'] }}15 !important;
     }
-    [data-user-mode="light"] aside nav button[class*="translate-x-1"] p.text-xs {
-        color: {{ $palette['950'] }} !important;
+
+    /* 2. Active Step Left Accent Light Bar */
+    .step-active-accent-bar {
+        background: linear-gradient(to bottom, {{ $palette['400'] }}, {{ $palette['600'] }}) !important;
+        box-shadow: 0 0 12px {{ $palette['500'] }}90 !important;
+    }
+
+    /* 3. Active Step Number / Avatar Badge */
+    .step-active-avatar {
+        background: linear-gradient(135deg, {{ $palette['500'] }}, {{ $palette['600'] }}) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 4px 14px {{ $palette['600'] }}50 !important;
+        color: #ffffff !important;
+    }
+    .step-active-avatar * {
+        color: #ffffff !important;
+    }
+
+    /* 4. Active Status Pill (• ACTIVE) */
+    .step-active-pill {
+        background-color: {{ $palette['600'] }} !important;
+        border: 1px solid {{ $palette['500'] }} !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px {{ $palette['600'] }}40 !important;
+    }
+    .step-active-pill,
+    .step-active-pill * {
+        color: #ffffff !important;
+    }
+
+    /* 5. Active Step Subtitle ("STEP 01") */
+    .step-active-subtitle {
+        color: {{ $palette['600'] }} !important;
+        font-weight: 800 !important;
+    }
+
+    /* 6. Active Step Title ("CATEGORY & PROGRAM") */
+    .step-active-title {
+        color: #ffffff !important;
+        font-weight: 900 !important;
+    }
+    [data-user-mode="light"] .step-active-title {
+        color: #0f172a !important;
         font-weight: 900 !important;
     }
 
-    /* Selected Option Cards (e.g. PhD, active step card) — ONLY cards, NOT buttons */
-    [data-user-mode="light"] div[class*="bg-indigo-500"]:not(button):not(span),
-    [data-user-mode="light"] div[class*="bg-indigo-600"]:not(button):not(span),
+    /* 3D Floating Glassmorphic Inactive Navigation Cards (Light Mode) */
+    [data-user-mode="light"] aside nav button:not(.step-card-active):not([data-active-step="true"]):not([class*="translate-x-1"]) {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-user-mode="light"] aside nav button:not(.step-card-active):not([data-active-step="true"]):not([class*="translate-x-1"]):hover {
+        background-color: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07) !important;
+    }
+    [data-user-mode="light"] aside nav button p.text-xs:not(.step-active-title) {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+
+    /* Selected Option Cards (e.g. PhD, active step card) — ONLY cards, NOT buttons or progress bars */
+    [data-user-mode="light"] div[class*="bg-indigo-500"]:not(button):not(span):not(.h-full):not([data-progress-bar-fill]),
+    [data-user-mode="light"] div[class*="bg-indigo-600"]:not(button):not(span):not(.h-full):not([data-progress-bar-fill]),
     [data-user-mode="light"] label[class*="bg-indigo-500"]:not(button),
     [data-user-mode="light"] label[class*="bg-indigo-600"]:not(button) {
         background-color: {{ $palette['100'] }} !important;
         border-color: {{ $palette['500'] }} !important;
         color: {{ $palette['800'] }} !important;
         font-weight: 700 !important;
+    }
+
+    /* ============================================================ */
+    /* 🚀 PROGRESS BARS — MATCH EXACT PRIMARY BUTTON THEME COLOR    */
+    /* ============================================================ */
+    [data-progress-bar-fill],
+    .progress-bar-fill,
+    div.h-full.bg-indigo-600,
+    div.h-full.bg-primary-600,
+    div[class*="bg-indigo-600"][class*="h-full"],
+    div[class*="bg-primary-600"][class*="h-full"],
+    [data-user-mode="light"] div.h-full.bg-indigo-600,
+    [data-user-mode="light"] div.h-full.bg-primary-600,
+    [data-user-mode="light"] [data-progress-bar-fill],
+    [data-user-mode="dark"] div.h-full.bg-indigo-600,
+    [data-user-mode="dark"] div.h-full.bg-primary-600,
+    [data-user-mode="dark"] [data-progress-bar-fill],
+    div[x-ref="progress"] {
+        background-color: {{ $palette['600'] }} !important;
+        background-image: linear-gradient(to right, {{ $palette['500'] }}, {{ $palette['600'] }}) !important;
+        box-shadow: 0 0 10px {{ $palette['500'] }}80 !important;
     }
 
     /* Light Mode Primary Action Buttons — ALWAYS 100% Solid Primary Background & White Text */

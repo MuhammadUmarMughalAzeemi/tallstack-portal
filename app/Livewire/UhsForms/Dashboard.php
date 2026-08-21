@@ -35,7 +35,8 @@ class Dashboard extends Component
         if ($this->challan && ! is_string($this->challan)) {
             /** @var \App\Models\User $user */
             $user = auth()->user();
-            $path = $this->challan->store($user->id . '_images', 'public');
+            $ext = $this->challan->getClientOriginalExtension() ?: 'jpg';
+            $path = $this->challan->storeAs((string) $user->id, 'challan.' . $ext, 'public');
 
             Media::updateOrCreate(
                 [

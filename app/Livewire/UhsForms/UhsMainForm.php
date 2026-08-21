@@ -48,7 +48,6 @@ class UhsMainForm extends Component
             1 => $this->step1Active = true,
             2 => $this->step2Active = true,
             3 => $this->step3Active = true,
-            4 => $this->step4Active = true,
             5 => $this->step5Active = true,
             6 => $this->step6Active = true,
             7 => $this->step7Active = true,
@@ -69,6 +68,7 @@ class UhsMainForm extends Component
 
     public function mount(): void
     {
+        /** @var \App\Models\User|null $user */
         $user = auth()->user();
         if ($user) {
             if ($user->submitted_at) {
@@ -99,7 +99,7 @@ class UhsMainForm extends Component
                     $this->goToStep(6);
                 }
 
-                if (! blank($user->userCnic)) {
+                if ($user->hasMedia(\App\Models\User::MEDIA_CNIC)) {
                     $this->completeStep('step6Completed');
                     $this->goToStep(7);
                 }

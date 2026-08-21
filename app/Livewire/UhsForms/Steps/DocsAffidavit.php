@@ -35,14 +35,23 @@ class DocsAffidavit extends Component
 
     // ─── Standard document temp files ───────────────────────────────────────
     public $cnic;
+
     public $cnicBack;
+
     public $fatherCnic;
+
     public $fatherCnicBack;
+
     public $photo;
+
     public $signature;
+
     public $domicile;
+
     public $matricTranscript;
+
     public $intermediateTranscript;
+
     public $mdcatResult;
 
     /**
@@ -55,16 +64,25 @@ class DocsAffidavit extends Component
     public array $docErrors = [];
 
     // ─── Saved public URLs (populated in mount from Spatie) ─────────────────
-    public ?string $savedCnic                    = null;
-    public ?string $savedCnicBack                = null;
-    public ?string $savedFatherCnic              = null;
-    public ?string $savedFatherCnicBack          = null;
-    public ?string $savedPhoto                   = null;
-    public ?string $savedSignature               = null;
-    public ?string $savedDomicile                = null;
-    public ?string $savedMatricTranscript        = null;
-    public ?string $savedIntermediateTranscript  = null;
-    public ?string $savedMdcatResult             = null;
+    public ?string $savedCnic = null;
+
+    public ?string $savedCnicBack = null;
+
+    public ?string $savedFatherCnic = null;
+
+    public ?string $savedFatherCnicBack = null;
+
+    public ?string $savedPhoto = null;
+
+    public ?string $savedSignature = null;
+
+    public ?string $savedDomicile = null;
+
+    public ?string $savedMatricTranscript = null;
+
+    public ?string $savedIntermediateTranscript = null;
+
+    public ?string $savedMdcatResult = null;
 
     // ─── Other documents ────────────────────────────────────────────────────
     // Each entry: ['id' => int|null, 'docName' => string, 'file' => null,
@@ -81,43 +99,43 @@ class DocsAffidavit extends Component
     // ─── Maps field name → User::MEDIA_* collection constant ────────────────
     // Used by saveSingleDocument() to avoid repetitive switch/case.
     private const FIELD_COLLECTION_MAP = [
-        'cnic'                   => User::MEDIA_CNIC,
-        'cnicBack'               => User::MEDIA_CNIC_BACK,
-        'fatherCnic'             => User::MEDIA_FATHER_CNIC,
-        'fatherCnicBack'         => User::MEDIA_FATHER_CNIC_BACK,
-        'photo'                  => User::MEDIA_PHOTO,
-        'signature'              => User::MEDIA_SIGNATURE,
-        'domicile'               => User::MEDIA_DOMICILE,
-        'matricTranscript'       => User::MEDIA_MATRIC_TRANSCRIPT,
+        'cnic' => User::MEDIA_CNIC,
+        'cnicBack' => User::MEDIA_CNIC_BACK,
+        'fatherCnic' => User::MEDIA_FATHER_CNIC,
+        'fatherCnicBack' => User::MEDIA_FATHER_CNIC_BACK,
+        'photo' => User::MEDIA_PHOTO,
+        'signature' => User::MEDIA_SIGNATURE,
+        'domicile' => User::MEDIA_DOMICILE,
+        'matricTranscript' => User::MEDIA_MATRIC_TRANSCRIPT,
         'intermediateTranscript' => User::MEDIA_INTERMEDIATE_TRANSCRIPT,
-        'mdcatResult'            => User::MEDIA_MDCAT_RESULT,
+        'mdcatResult' => User::MEDIA_MDCAT_RESULT,
     ];
 
     // Matching saved-URL property names (same order as FIELD_COLLECTION_MAP)
     private const FIELD_SAVED_MAP = [
-        'cnic'                   => 'savedCnic',
-        'cnicBack'               => 'savedCnicBack',
-        'fatherCnic'             => 'savedFatherCnic',
-        'fatherCnicBack'         => 'savedFatherCnicBack',
-        'photo'                  => 'savedPhoto',
-        'signature'              => 'savedSignature',
-        'domicile'               => 'savedDomicile',
-        'matricTranscript'       => 'savedMatricTranscript',
+        'cnic' => 'savedCnic',
+        'cnicBack' => 'savedCnicBack',
+        'fatherCnic' => 'savedFatherCnic',
+        'fatherCnicBack' => 'savedFatherCnicBack',
+        'photo' => 'savedPhoto',
+        'signature' => 'savedSignature',
+        'domicile' => 'savedDomicile',
+        'matricTranscript' => 'savedMatricTranscript',
         'intermediateTranscript' => 'savedIntermediateTranscript',
-        'mdcatResult'            => 'savedMdcatResult',
+        'mdcatResult' => 'savedMdcatResult',
     ];
 
     // ─── Validation ─────────────────────────────────────────────────────────
     private const REQUIRED_DOCUMENTS = [
-        'cnic'                   => ['saved' => 'savedCnic', 'label' => 'CNIC / Passport — Front'],
-        'cnicBack'               => ['saved' => 'savedCnicBack', 'label' => 'CNIC / Passport — Back'],
-        'fatherCnic'             => ['saved' => 'savedFatherCnic', 'label' => "Father's CNIC — Front"],
-        'fatherCnicBack'         => ['saved' => 'savedFatherCnicBack', 'label' => "Father's CNIC — Back"],
-        'photo'                  => ['saved' => 'savedPhoto', 'label' => 'Passport Size Photo'],
-        'signature'              => ['saved' => 'savedSignature', 'label' => 'Digital Signature'],
-        'matricTranscript'       => ['saved' => 'savedMatricTranscript', 'label' => 'Matric / SSC Transcript'],
+        'cnic' => ['saved' => 'savedCnic', 'label' => 'CNIC / Passport — Front'],
+        'cnicBack' => ['saved' => 'savedCnicBack', 'label' => 'CNIC / Passport — Back'],
+        'fatherCnic' => ['saved' => 'savedFatherCnic', 'label' => "Father's CNIC — Front"],
+        'fatherCnicBack' => ['saved' => 'savedFatherCnicBack', 'label' => "Father's CNIC — Back"],
+        'photo' => ['saved' => 'savedPhoto', 'label' => 'Passport Size Photo'],
+        'signature' => ['saved' => 'savedSignature', 'label' => 'Digital Signature'],
+        'matricTranscript' => ['saved' => 'savedMatricTranscript', 'label' => 'Matric / SSC Transcript'],
         'intermediateTranscript' => ['saved' => 'savedIntermediateTranscript', 'label' => 'F.Sc / HSSC Transcript'],
-        'domicile'               => ['saved' => 'savedDomicile', 'label' => 'Domicile Certificate'],
+        'domicile' => ['saved' => 'savedDomicile', 'label' => 'Domicile Certificate'],
     ];
 
     protected function rules(): array
@@ -131,7 +149,7 @@ class DocsAffidavit extends Component
         if ($this->otherDocumentsEnabled) {
             // Get first row
             $firstRow = $this->otherDocuments[0] ?? null;
-            $isSaved = $firstRow && !empty($firstRow['savedUrl']);
+            $isSaved = $firstRow && ! empty($firstRow['savedUrl']);
 
             // First row is mandatory when section is enabled
             // But if already saved, don't require the temp file field
@@ -150,15 +168,15 @@ class DocsAffidavit extends Component
                     continue; // Already validated above
                 }
 
-                $hasName = !empty(trim($doc['docName'] ?? ''));
-                $hasFile = !empty($doc['file']) && !is_string($doc['file']);
-                $hasSaved = !empty($doc['savedUrl']);
+                $hasName = ! empty(trim($doc['docName'] ?? ''));
+                $hasFile = ! empty($doc['file']) && ! is_string($doc['file']);
+                $hasSaved = ! empty($doc['savedUrl']);
 
                 // If row has ANY data, enforce BOTH fields
                 if ($hasName || $hasFile || $hasSaved) {
                     $rules["otherDocuments.{$index}.docName"] = 'required|string|min:3';
 
-                    if (!$hasSaved) {
+                    if (! $hasSaved) {
                         $rules["otherDocuments.{$index}.file"] = 'required';
                     }
                 }
@@ -202,12 +220,12 @@ class DocsAffidavit extends Component
             return;
         }
 
-        $this->terms   = (bool) $user->accepted_terms_and_conditions;
-        $mediaService  = new UserMediaService($user);
+        $this->terms = (bool) $user->accepted_terms_and_conditions;
+        $mediaService = new UserMediaService($user);
 
         // Load saved URLs for all standard documents
         foreach (self::FIELD_COLLECTION_MAP as $field => $collection) {
-            $savedProp        = self::FIELD_SAVED_MAP[$field];
+            $savedProp = self::FIELD_SAVED_MAP[$field];
             $this->$savedProp = $mediaService->url($collection);
         }
 
@@ -217,10 +235,10 @@ class DocsAffidavit extends Component
         if ($others->isNotEmpty()) {
             foreach ($others as $media) {
                 $this->otherDocuments[] = [
-                    'id'        => $media->id,
-                    'docName'   => $media->name,
-                    'file'      => null,
-                    'savedUrl'  => $media->getUrl(),
+                    'id' => $media->id,
+                    'docName' => $media->name,
+                    'file' => null,
+                    'savedUrl' => $media->getUrl(),
                     'savedName' => $media->name,
                 ];
             }
@@ -250,19 +268,19 @@ class DocsAffidavit extends Component
         }
 
         /** @var User $user */
-        $user       = auth()->user();
+        $user = auth()->user();
         $collection = self::FIELD_COLLECTION_MAP[$field];
-        $savedProp  = self::FIELD_SAVED_MAP[$field];
+        $savedProp = self::FIELD_SAVED_MAP[$field];
 
         $media = (new UserMediaService($user))->save($collection, $file);
 
         $this->$savedProp = $media->getUrl();
-        $this->$field     = null;
+        $this->$field = null;
 
         // Clear inline required error after successful save
         unset($this->docErrors[$field]);
 
-        $this->toast()->success('Saved', 'Document saved successfully.')->send();
+        $this->toast()->timeout(3)->success('Saved', 'Document saved successfully.')->send();
     }
 
     public function hasPendingUploads(): bool
@@ -370,17 +388,19 @@ class DocsAffidavit extends Component
      */
     public function saveOtherDocument(int $index): void
     {
-        $row     = $this->otherDocuments[$index] ?? null;
+        $row = $this->otherDocuments[$index] ?? null;
         $docName = trim($row['docName'] ?? '');
-        $file    = $row['file'] ?? null;
+        $file = $row['file'] ?? null;
 
         if (empty($docName)) {
             $this->addError("otherDocuments.{$index}.docName", 'Please enter a document name.');
+
             return;
         }
 
         if (! $file || is_string($file)) {
             $this->addError("otherDocuments.{$index}.file", 'Please choose a file to upload.');
+
             return;
         }
 
@@ -391,14 +411,14 @@ class DocsAffidavit extends Component
         $media = (new UserMediaService($user))->saveOther($file, $docName, $row['id'] ?? null);
 
         $this->otherDocuments[$index] = [
-            'id'        => $media->id,
-            'docName'   => $docName,
-            'file'      => null,
-            'savedUrl'  => $media->getUrl(),
+            'id' => $media->id,
+            'docName' => $docName,
+            'file' => null,
+            'savedUrl' => $media->getUrl(),
             'savedName' => $docName,
         ];
 
-        $this->toast()->success('Saved', "\"{$docName}\" saved successfully.")->send();
+        $this->toast()->timeout(3)->success('Saved', "\"{$docName}\" saved successfully.")->send();
     }
 
     /**

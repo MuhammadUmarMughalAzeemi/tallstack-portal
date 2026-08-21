@@ -23,16 +23,23 @@
     }
 
     $defaultInstruction = $instruction ?? 'JPG, PNG (Max 2MB) • Scanned color copy';
+
+    $savedFileName = null;
+    if ($saved) {
+        $parsedPath = parse_url($saved, PHP_URL_PATH) ?? $saved;
+        $savedFileName = urldecode(basename($parsedPath));
+    }
 @endphp
 
 <div
     class="w-full font-sans"
-    wire:key="upload-{{ $id }}-{{ $saved ? 'saved' : ($isPending ? 'pending' : 'empty') }}"
+    wire:key="upload-{{ $id }}-{{ $isPending ? 'pending' : ($saved ? 'saved' : 'empty') }}"
     x-data="{ progress: 0, uploading: false }"
-    x-on:livewire-upload-start="$event.target.matches('[data-upload-field=\'{{ $id }}\']') && (uploading = true, progress = 0)"
-    x-on:livewire-upload-progress="$event.target.matches('[data-upload-field=\'{{ $id }}\']') && (progress = $event.detail.progress)"
-    x-on:livewire-upload-error="$event.target.matches('[data-upload-field=\'{{ $id }}\']') && (uploading = false, progress = 0)"
-    x-on:livewire-upload-finish="$event.target.matches('[data-upload-field=\'{{ $id }}\']') && (uploading = false, progress = 100)"
+    x-on:livewire-upload-start="if ($el.contains($event.target) || ($event.target && $event.target.matches && $event.target.matches('[data-upload-field=\'{{ $id }}\']'))) { uploading = true; progress = 0; }"
+    x-on:livewire-upload-progress="if ($el.contains($event.target) || ($event.target && $event.target.matches && $event.target.matches('[data-upload-field=\'{{ $id }}\']'))) { progress = $event.detail.progress; }"
+    x-on:livewire-upload-error="uploading = false; progress = 0;"
+    x-on:livewire-upload-finish="uploading = false; progress = 0;"
+    x-on:livewire-upload-cancel="uploading = false; progress = 0;"
 >
     {{-- ========================================================================= --}}
     {{-- SAVED STATE: 100% Solid (No Transparencies), SaaS Left-Accent & Badges    --}}
@@ -102,16 +109,19 @@
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-200 border border-slate-700 light:bg-slate-100 light:text-slate-800 light:border-slate-300">
                     ⚖ Max 2MB
                 </span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 light:bg-emerald-100 light:text-emerald-900 light:border-emerald-300">
-                    ✓ Verified Document
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 light:bg-emerald-100 light:text-emerald-900 light:border-emerald-300 max-w-full truncate" title="{{ $label }} Uploaded">
+                    <svg class="w-3 h-3 text-emerald-400 light:text-emerald-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="truncate">✓ {{ $label }} Uploaded</span>
                 </span>
             </div>
 
             {{-- Upload Progress --}}
-            <div x-show="uploading" x-cloak class="border-t border-indigo-600 bg-slate-800 light:bg-slate-100 rounded-lg p-2">
+            <div x-show="uploading" x-cloak class="border-t border-slate-700/60 light:border-slate-200 bg-slate-800/80 light:bg-slate-50 rounded-lg p-2 mt-1">
                 <p class="text-[10px] text-indigo-400 font-bold light:text-indigo-700 mb-1" x-text="'Uploading ' + progress + '%'"></p>
-                <div class="h-1.5 bg-slate-700 light:bg-slate-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-indigo-600 transition-all duration-150 ease-out" :style="`width: ${progress}%`"></div>
+                <div class="h-2 bg-slate-700 light:bg-slate-200 rounded-full overflow-hidden p-0.5 border border-slate-600/40 light:border-slate-300">
+                    <div class="h-full rounded-full transition-all duration-150 ease-out" data-progress-bar-fill :style="`width: ${progress}%`"></div>
                 </div>
             </div>
         </div>
@@ -228,8 +238,8 @@
                 </div>
 
                 {{-- Upload Progress --}}
-                <div class="h-1.5 bg-slate-800 light:bg-slate-200 rounded-full overflow-hidden mt-1" x-show="uploading" x-cloak>
-                    <div class="h-full bg-indigo-600 transition-all duration-150 ease-out" :style="`width: ${progress}%`"></div>
+                <div class="h-2 bg-slate-800/80 light:bg-slate-200 rounded-full overflow-hidden mt-1 p-0.5 border border-slate-700/40 light:border-slate-300" x-show="uploading" x-cloak>
+                    <div class="h-full rounded-full transition-all duration-150 ease-out" data-progress-bar-fill :style="`width: ${progress}%`"></div>
                 </div>
             </div>
         </div>

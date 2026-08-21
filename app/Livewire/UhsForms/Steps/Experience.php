@@ -50,7 +50,7 @@ class Experience extends Component
         UserExperience::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 4, data: $data);
-        $this->toast()->success('Step 4: Professional experience saved.')->send();
+        $this->toast()->timeout(3)->success('Step 4: Professional experience saved.')->send();
     }
 
     public function render()

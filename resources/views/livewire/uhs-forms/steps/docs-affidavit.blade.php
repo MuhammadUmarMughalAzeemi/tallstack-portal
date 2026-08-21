@@ -384,10 +384,11 @@
                             {{-- Empty picker --}}
                             <div class="relative group"
                                  x-data="{ progress: 0, uploading: false }"
-                                 x-on:livewire-upload-start="$event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']') && (uploading = true, progress = 0)"
-                                 x-on:livewire-upload-progress="$event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']') && (progress = $event.detail.progress)"
-                                 x-on:livewire-upload-error="$event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']') && (uploading = false, progress = 0)"
-                                 x-on:livewire-upload-finish="$event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']') && (uploading = false, progress = 100)">
+                                 x-on:livewire-upload-start="if ($el.contains($event.target) || ($event.target && $event.target.matches && $event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']'))) { uploading = true; progress = 0; }"
+                                 x-on:livewire-upload-progress="if ($el.contains($event.target) || ($event.target && $event.target.matches && $event.target.matches('[data-upload-field=\'other-doc-{{ $index }}\']'))) { progress = $event.detail.progress; }"
+                                 x-on:livewire-upload-error="uploading = false; progress = 0;"
+                                 x-on:livewire-upload-finish="uploading = false; progress = 0;"
+                                 x-on:livewire-upload-cancel="uploading = false; progress = 0;">
                                 <input type="file"
                                        wire:model="otherDocuments.{{ $index }}.file"
                                        accept="image/*"

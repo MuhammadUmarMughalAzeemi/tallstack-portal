@@ -15,8 +15,8 @@ class Preferences extends Component
     public $campus;
     public $searchCollege = '';
 
-    // Mock college list with long names (replace with DB query if needed)
-    private $colleges = [
+    /** @var array<int, string> */
+    public array $colleges = [
         'University Medical & Dental College, Faisalabad (For Women Only) (University of Faisalabad)',
         'Aga Khan University Medical College, Karachi',
         'Allama Iqbal Medical College, Lahore',
@@ -65,7 +65,7 @@ class Preferences extends Component
         UserPreference::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 6, data: $data);
-        $this->toast()->success('Step 7: Preferences saved.')->send();
+        $this->toast()->timeout(3)->success('Step 7: Preferences saved.')->send();
     }
 
     public function render()

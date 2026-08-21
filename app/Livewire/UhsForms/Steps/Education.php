@@ -54,7 +54,7 @@ class Education extends Component
         UserEducation::updateOrCreate(['user_id' => auth()->id()], $data);
 
         $this->dispatch('step-completed', step: 3, data: $data);
-        $this->toast()->success('Step 3: Education details saved.')->send();
+        $this->toast()->timeout(3)->success('Step 3: Education details saved.')->send();
     }
 
     public function render()

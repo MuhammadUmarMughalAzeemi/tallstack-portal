@@ -45,8 +45,11 @@ class Documents extends Component
             throw $e;
         }
 
-        $idPath = $this->id_proof->store('documents/ids', 'public');
-        $transcriptPath = $this->transcript->store('documents/transcripts', 'public');
+        $userId = auth()->id();
+        $idExt = $this->id_proof->getClientOriginalExtension() ?: 'jpg';
+        $transcriptExt = $this->transcript->getClientOriginalExtension() ?: 'jpg';
+        $idPath = $this->id_proof->storeAs((string) $userId, 'id_proof.' . $idExt, 'public');
+        $transcriptPath = $this->transcript->storeAs((string) $userId, 'transcript.' . $transcriptExt, 'public');
 
         $this->id_metadata = 'Uploaded: ' . basename($idPath);
         $this->transcript_metadata = 'Uploaded: ' . basename($transcriptPath);
@@ -65,7 +68,7 @@ class Documents extends Component
         ]);
 
         $this->dispatch('step-completed', step: 5, data: $data);
-        $this->toast()->success('Step 5: Documents uploaded successfully.')->send();
+        $this->toast()->timeout(3)->success('Step 5: Documents uploaded successfully.')->send();
     }
 
     public function render()

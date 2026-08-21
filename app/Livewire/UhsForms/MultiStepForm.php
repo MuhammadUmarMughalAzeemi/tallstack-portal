@@ -42,15 +42,9 @@ class MultiStepForm extends Component
 
     public function handleCompleteStep($stepKey): void
     {
+        $num = null;
         if (is_numeric($stepKey)) {
-            $stepNum = (int) $stepKey;
-            // Skip step 4 — it's bypassed and not in $steps array
-            if ($stepNum === 4) {
-                return;
-            }
-            if (isset($this->steps[$stepNum])) {
-                $this->steps[$stepNum]['completed'] = true;
-            }
+            $num = (int) $stepKey;
         } else {
             // Map legacy step strings e.g. 'step1Completed'
             $map = [
@@ -63,16 +57,18 @@ class MultiStepForm extends Component
                 'step7Completed' => 7,
                 'step8Completed' => 8,
             ];
-            if (isset($map[$stepKey])) {
-                $num = $map[$stepKey];
-                // Skip step 4 — not in $steps array
-                if ($num === 4) {
-                    return;
-                }
-                if (isset($this->steps[$num])) {
-                    $this->steps[$num]['completed'] = true;
-                }
-            }
+            $num = $map[$stepKey] ?? null;
+        }
+
+        // Skip step 4 — bypassed
+        if ($num === null || $num === 4) {
+            return;
+        }
+
+        if (isset($this->steps[$num])) {
+            $this->steps[$num]['completed'] = true;
+            $stepName = $this->steps[$num]['name'];
+            $this->toast()->timeout(3)->success('Saved', "{$stepName} details saved successfully.")->send();
         }
     }
 

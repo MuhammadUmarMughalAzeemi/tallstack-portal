@@ -24,7 +24,7 @@ class Review extends Component
     public function save()
     {
         $this->dispatch('step-completed', step: 7, data: []);
-        $this->toast()->success('Step 7: Final review acknowledged.')->send();
+        $this->toast()->timeout(3)->success('Step 7: Final review acknowledged.')->send();
     }
 
     public function render()

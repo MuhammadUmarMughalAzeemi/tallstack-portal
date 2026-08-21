@@ -336,15 +336,52 @@
 
                 <!-- Clinical Experience (If Present) -->
                 @if(!empty($experiences) && count($experiences) > 0)
-                    <div class="pt-2.5 border-t border-slate-800/40 light:border-slate-200 space-y-1.5">
-                        <span class="text-[10px] font-bold text-slate-400 light:text-slate-500 uppercase tracking-wider block">Clinical Experience</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            @foreach($experiences as $exp)
-                                <div class="p-2 rounded-lg bg-slate-950/40 light:bg-slate-50 border border-slate-800/60 light:border-slate-200">
-                                    <strong class="text-slate-200 light:text-slate-800 text-[11px] block">{{ $exp['designation'] ?? 'Designation' }}</strong>
-                                    <span class="text-slate-400 text-[10px] block">{{ $exp['institute'] ?? 'Institute' }} ({{ $exp['fromDate'] ?? '' }} to {{ $exp['toDate'] ?? 'Present' }})</span>
-                                </div>
-                            @endforeach
+                    <div class="pt-3 border-t border-slate-800/40 light:border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-slate-400 light:text-slate-500 uppercase tracking-wider block">Clinical Experience</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-950/60 light:bg-slate-100 text-slate-300 light:text-slate-700 border border-slate-800 light:border-slate-200">
+                                {{ count($experiences) }} {{ count($experiences) === 1 ? 'Record' : 'Records' }}
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto rounded-xl border border-slate-800/80 light:border-slate-200 bg-slate-950/40 light:bg-white shadow-sm">
+                            <table class="min-w-full text-left text-xs divide-y divide-slate-800/60 light:divide-slate-200">
+                                <thead class="bg-slate-950/80 light:bg-slate-50 text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider">
+                                    <tr>
+                                        <th scope="col" class="px-3 py-2 text-center w-10">#</th>
+                                        <th scope="col" class="px-3 py-2">Organization / Institute</th>
+                                        <th scope="col" class="px-3 py-2">Designation / Role</th>
+                                        <th scope="col" class="px-3 py-2">From Date</th>
+                                        <th scope="col" class="px-3 py-2">To Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/40 light:divide-slate-200 font-sans">
+                                    @foreach($experiences as $index => $exp)
+                                        <tr class="hover:bg-slate-900/40 light:hover:bg-slate-50/80 transition-colors">
+                                            <td class="px-3 py-2 text-center font-mono text-[10px] font-bold text-slate-500 light:text-slate-400">
+                                                {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                                            </td>
+                                            <td class="px-3 py-2 font-semibold text-slate-200 light:text-slate-800 text-[11px]">
+                                                {{ $exp['institute'] ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-3 py-2 text-slate-300 light:text-slate-700 text-[11px]">
+                                                {{ $exp['designation'] ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-3 py-2 font-mono text-[11px] text-slate-300 light:text-slate-700 whitespace-nowrap">
+                                                {{ !empty($exp['fromDate']) ? $exp['fromDate'] : '—' }}
+                                            </td>
+                                            <td class="px-3 py-2 font-mono text-[11px] whitespace-nowrap">
+                                                @if(!empty($exp['toDate']))
+                                                    <span class="text-slate-300 light:text-slate-700">{{ $exp['toDate'] }}</span>
+                                                @else
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 light:bg-emerald-100 light:text-emerald-800">
+                                                        Present
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 @endif

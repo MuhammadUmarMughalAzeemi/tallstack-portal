@@ -79,7 +79,7 @@ class PersonalDetails extends Component
         // Load CNIC Type name from registration
         if ($this->cnic) {
             $cnicType = CnicPassport::find($this->cnic);
-            $this->cnicTypeName = $cnicType?->name ?? 'Not Selected';
+            $this->cnicTypeName = $cnicType ? $cnicType->name : 'Not Selected';
         }
 
         $details = $user->personalDetails;

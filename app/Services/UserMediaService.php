@@ -36,6 +36,22 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class UserMediaService
 {
+    /**
+     * Mapping of standard media collection names to clean file names on disk.
+     */
+    public const COLLECTION_FILENAME_MAP = [
+        User::MEDIA_CNIC                    => 'cnic',
+        User::MEDIA_CNIC_BACK               => 'cnic_backside',
+        User::MEDIA_FATHER_CNIC             => 'father_cnic',
+        User::MEDIA_FATHER_CNIC_BACK        => 'father_cnic_backside',
+        User::MEDIA_PHOTO                   => 'photo',
+        User::MEDIA_SIGNATURE               => 'signature',
+        User::MEDIA_DOMICILE                => 'domicile',
+        User::MEDIA_MATRIC_TRANSCRIPT       => 'matric_transcript',
+        User::MEDIA_INTERMEDIATE_TRANSCRIPT => 'intermediate_transcript',
+        User::MEDIA_MDCAT_RESULT            => 'mdcat_result',
+    ];
+
     public function __construct(protected User $user)
     {
     }
@@ -51,9 +67,11 @@ class UserMediaService
      */
     public function save(string $collection, TemporaryUploadedFile $file): Media
     {
+        $fileName = $this->determineFileName($collection, $file);
+
         return $this->user
             ->addMedia($file->getRealPath())
-            ->usingFileName($this->sanitizeFileName($file))
+            ->usingFileName($fileName)
             ->usingName($collection)
             ->toMediaCollection($collection);
         // singleFile() defined on the collection auto-deletes the previous file
@@ -73,9 +91,11 @@ class UserMediaService
             $this->deleteById($replaceId);
         }
 
+        $fileName = $this->determineOtherFileName($file, $docName);
+
         return $this->user
             ->addMedia($file->getRealPath())
-            ->usingFileName($this->sanitizeFileName($file))
+            ->usingFileName($fileName)
             ->usingName($docName)
             ->toMediaCollection(User::MEDIA_OTHER_DOCUMENTS);
     }
@@ -128,14 +148,29 @@ class UserMediaService
     // ─── Helpers ────────────────────────────────────────────────────────────
 
     /**
-     * Build a clean file name: userId_collection_originalName
+     * Determine the clean file name for a standard collection.
+     * E.g. 'cnic.jpg', 'cnic_backside.png', 'father_cnic.jpg', etc.
      */
-    private function sanitizeFileName(TemporaryUploadedFile $file): string
+    public function determineFileName(string $collection, TemporaryUploadedFile $file): string
     {
-        $original = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $ext      = $file->getClientOriginalExtension();
-        $slug     = str($original)->slug()->limit(40)->toString();
+        $baseName = self::COLLECTION_FILENAME_MAP[$collection] ?? str($collection)->slug('_')->toString();
+        $ext      = $file->getClientOriginalExtension() ?: ($file->extension() ?: 'jpg');
 
-        return "{$this->user->id}_{$slug}.{$ext}";
+        return "{$baseName}.{$ext}";
+    }
+
+    /**
+     * Determine the clean file name for an other-document item.
+     * E.g. 'experience_certificate.pdf', 'noc.jpg', etc.
+     */
+    public function determineOtherFileName(TemporaryUploadedFile $file, string $docName): string
+    {
+        $slug = str($docName)->slug('_')->limit(40)->toString();
+        if (empty($slug)) {
+            $slug = 'other_document';
+        }
+        $ext = $file->getClientOriginalExtension() ?: ($file->extension() ?: 'jpg');
+
+        return "{$slug}.{$ext}";
     }
 }

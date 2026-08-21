@@ -73,10 +73,10 @@
                 <button
                     @if(! $isUnlocked) disabled @endif
                     wire:click="goToStep({{ $stepNumber }})"
+                    data-active-step="{{ $isActive ? 'true' : 'false' }}"
                     class="w-full text-left group relative flex items-center gap-3.5 p-3.5 rounded-2xl transition-all duration-300
                     @if($isActive)
-                        bg-gradient-to-r from-indigo-900/70 via-indigo-950/90 to-purple-950/60 border border-indigo-500/60 shadow-lg shadow-indigo-600/20 translate-x-1
-                        light:bg-gradient-to-r light:from-indigo-50/95 light:via-white light:to-purple-50/70 light:border-indigo-300 light:shadow-md light:shadow-indigo-500/15
+                        step-card-active translate-x-1
                     @elseif($isCompleted)
                         bg-slate-900/70 border border-slate-800/90 hover:border-emerald-500/40 hover:bg-slate-800/80 hover:-translate-y-0.5 shadow-sm
                         light:bg-white light:border-slate-200/90 light:shadow-xs light:hover:border-emerald-400/80 light:hover:bg-slate-50/90 light:hover:shadow-sm
@@ -87,13 +87,13 @@
                 >
                     {{-- 3D Left Glow Accent Bar for Active Card --}}
                     @if($isActive)
-                        <div class="absolute left-0 top-3 bottom-3 w-1.5 rounded-r-full bg-gradient-to-b from-indigo-400 to-purple-500 shadow-md shadow-indigo-400/50 light:from-indigo-600 light:to-purple-600"></div>
+                        <div class="absolute left-0 top-3 bottom-3 w-1.5 rounded-r-full step-active-accent-bar"></div>
                     @endif
 
                     {{-- 3D Step Avatar Badge --}}
                     <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black transition-all duration-300 flex-shrink-0
                         @if($isActive)
-                            bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 ring-2 ring-indigo-400/40 border border-white/20
+                            step-active-avatar
                         @elseif($isCompleted)
                             bg-emerald-500/15 text-emerald-400 border border-emerald-500/35 shadow-xs light:bg-emerald-50 light:text-emerald-700 light:border-emerald-200
                         @else
@@ -112,7 +112,7 @@
                         <div class="flex items-center justify-between gap-1 mb-0.5">
                             <span class="text-[9px] font-black uppercase tracking-widest
                                 @if($isActive)
-                                    text-indigo-400 light:text-indigo-700
+                                    step-active-subtitle
                                 @else
                                     text-slate-500 light:text-slate-500
                                 @endif
@@ -121,8 +121,8 @@
                             </span>
 
                             @if($isActive)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-black tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 light:bg-indigo-600 light:text-white light:border-transparent shadow-xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 light:bg-white animate-pulse"></span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[8.5px] font-black tracking-wider uppercase step-active-pill">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                                     Active
                                 </span>
                             @elseif($isCompleted)
@@ -134,7 +134,7 @@
 
                         <p class="text-xs uppercase tracking-tight truncate
                             @if($isActive)
-                                font-black text-white light:text-indigo-950
+                                step-active-title
                             @elseif($isCompleted)
                                 font-bold text-slate-100 light:text-slate-900
                             @else
